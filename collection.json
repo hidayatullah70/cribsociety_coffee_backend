@@ -1,0 +1,999 @@
+{
+  "info": {
+    "_postman_id": "cribsociety-coffee-api-collection",
+    "name": "Crib Society Coffee — REST API Collection",
+    "description": "Comprehensive Postman collection for Crib Society Coffee backend REST API covering Auth, Menu, Orders (POS), Payments, Inventory, Dashboard KPIs, Staff Management, and Public Guest endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. System & Health",
+      "item": [
+        {
+          "name": "Root Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login - Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.session && json.session.token) {",
+                  "        pm.collectionVariables.set('token', json.session.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner@cribsociety.coffee\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Staff (Barista)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.session && json.session.token) {",
+                  "        pm.collectionVariables.set('token', json.session.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sarah@cribsociety.coffee\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Menu & Catalog",
+      "item": [
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/categories?all=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "categories"],
+              "query": [
+                {
+                  "key": "all",
+                  "value": "false",
+                  "description": "Set true to include inactive categories"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Category (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Seasonal Specials\",\n  \"sortOrder\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Update Category (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Signature Artisanal Coffee\",\n  \"sortOrder\": 1,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/categories/cat_signature",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "categories", "cat_signature"]
+            }
+          }
+        },
+        {
+          "name": "Get Addons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/addons",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "addons"]
+            }
+          }
+        },
+        {
+          "name": "Create Addon (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hazelnut Syrup Pump\",\n  \"price\": 4000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/addons",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "addons"]
+            }
+          }
+        },
+        {
+          "name": "Get Products Catalog",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/products?categoryId=&available=true&includeArchived=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "products"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "",
+                  "description": "Filter by category ID"
+                },
+                {
+                  "key": "available",
+                  "value": "true",
+                  "description": "Filter by availability"
+                },
+                {
+                  "key": "includeArchived",
+                  "value": "false",
+                  "description": "Include soft-archived products"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/products/prod_crib_aren",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "products", "prod_crib_aren"]
+            }
+          }
+        },
+        {
+          "name": "Create Product (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"cat_signature\",\n  \"name\": \"Pistachio Velvet Latte\",\n  \"description\": \"Single origin espresso with rich roasted pistachio paste and velvety oat foam.\",\n  \"price\": 38000,\n  \"available\": true,\n  \"lowStockThreshold\": 8,\n  \"initialStock\": 25,\n  \"variants\": [\n    {\n      \"name\": \"Regular (12oz)\",\n      \"priceDelta\": 0\n    },\n    {\n      \"name\": \"Large (16oz)\",\n      \"priceDelta\": 6000\n    }\n  ],\n  \"addonIds\": [\n    \"add_extra_espresso\",\n    \"add_oat_milk\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "products"]
+            }
+          }
+        },
+        {
+          "name": "Update Product (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 30000,\n  \"available\": true,\n  \"lowStockThreshold\": 12\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/products/prod_crib_aren",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "products", "prod_crib_aren"]
+            }
+          }
+        },
+        {
+          "name": "Archive Product - Soft Delete (Owner Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/menu/products/prod_coco_cappuccino",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "menu", "products", "prod_coco_cappuccino"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Orders & POS",
+      "item": [
+        {
+          "name": "Create Order (POS Checkout)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"prod_crib_aren\",\n      \"quantity\": 2,\n      \"variantId\": \"var_aren_large\",\n      \"addonIds\": [\n        \"add_extra_espresso\"\n      ]\n    },\n    {\n      \"productId\": \"prod_croissant\",\n      \"quantity\": 1,\n      \"variantId\": null,\n      \"addonIds\": [\n        \"add_caramel_drizzle\"\n      ]\n    }\n  ],\n  \"discount\": {\n    \"type\": \"fixed\",\n    \"value\": 5000,\n    \"label\": \"Store Launch Promo\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Orders List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders?status=&orderNumber=&page=1&limit=20&from=&to=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: pending, paid, preparing, ready, completed, cancelled"
+                },
+                {
+                  "key": "orderNumber",
+                  "value": "",
+                  "description": "Filter by order number keyword"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "from",
+                  "value": ""
+                },
+                {
+                  "key": "to",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/ord_sample_01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "ord_sample_01"]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status Lifecycle",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ready\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/ord_sample_02/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "ord_sample_02", "status"]
+            }
+          }
+        },
+        {
+          "name": "Track Order By Number (#CSC-xxxx)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/track/%23CSC-1001",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "track", "%23CSC-1001"]
+            }
+          }
+        },
+        {
+          "name": "Get Live Orders Queue Board",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "queue"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Payments",
+      "item": [
+        {
+          "name": "Process Payment - QRIS",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"qris\",\n  \"amount\": 57000,\n  \"externalReference\": \"QRIS-GOPAY-992817231\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/ord_sample_01/payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "ord_sample_01", "payment"]
+            }
+          }
+        },
+        {
+          "name": "Process Payment - Cash",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"cash\",\n  \"amount\": 50000,\n  \"externalReference\": \"CASH-REC-1002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/ord_sample_02/payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "ord_sample_02", "payment"]
+            }
+          }
+        },
+        {
+          "name": "Process Payment - Card / EDC",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"card\",\n  \"amount\": 54000,\n  \"externalReference\": \"EDC-BCA-771829\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/orders/ord_sample_03/payment",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "orders", "ord_sample_03", "payment"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Inventory",
+      "item": [
+        {
+          "name": "Get Inventory Stock Overview",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory"]
+            }
+          }
+        },
+        {
+          "name": "Get Product Stock By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/inventory/prod_crib_aren",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "prod_crib_aren"]
+            }
+          }
+        },
+        {
+          "name": "Adjust Product Stock",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 50,\n  \"available\": true,\n  \"reason\": \"Weekly fresh bean restock arrival\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/inventory/prod_crib_aren",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "prod_crib_aren"]
+            }
+          }
+        },
+        {
+          "name": "Get Stock Adjustment History (Audit Trail)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/inventory/adjustments?productId=&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "inventory", "adjustments"],
+              "query": [
+                {
+                  "key": "productId",
+                  "value": "",
+                  "description": "Optional filter by product ID"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Dashboard KPIs",
+      "item": [
+        {
+          "name": "Get Dashboard Summary Metrics",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/dashboard/summary?from=&to=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dashboard", "summary"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "",
+                  "description": "ISO start date e.g. 2026-09-01"
+                },
+                {
+                  "key": "to",
+                  "value": "",
+                  "description": "ISO end date e.g. 2026-09-30"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Staff Management (Owner Only)",
+      "item": [
+        {
+          "name": "Get All Staff Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/staff",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "staff"]
+            }
+          }
+        },
+        {
+          "name": "Create New Staff Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rian Barista\",\n  \"email\": \"rian@cribsociety.coffee\",\n  \"password\": \"password123\",\n  \"role\": \"staff\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/staff",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "staff"]
+            }
+          }
+        },
+        {
+          "name": "Get Staff Account By ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/staff/usr_staff_01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "staff", "usr_staff_01"]
+            }
+          }
+        },
+        {
+          "name": "Update Staff Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sarah Head Barista\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/staff/usr_staff_01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "staff", "usr_staff_01"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Guest Public",
+      "item": [
+        {
+          "name": "Get Public Menu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/guest/menu?categoryId=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "guest", "menu"],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "",
+                  "description": "Optional category filter"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Live Queue Board",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/guest/queue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "guest", "queue"]
+            }
+          }
+        },
+        {
+          "name": "Public Track Order By Number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/guest/track/%23CSC-1001",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "guest", "track", "%23CSC-1001"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

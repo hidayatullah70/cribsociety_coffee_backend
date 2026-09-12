@@ -1,0 +1,33 @@
+{
+  "name": "cribsociety-coffee-backend",
+  "version": "1.0.0",
+  "description": "Backend REST API for Crib Society Coffee",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:init": "node src/scripts/initDb.js",
+    "test": "node test/integration.test.js"
+  },
+  "keywords": [
+    "cribsociety",
+    "coffee",
+    "pos",
+    "express",
+    "rest-api"
+  ],
+  "author": "Crib Society Coffee Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
