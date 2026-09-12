@@ -12,7 +12,7 @@ module.exports = {
     PORT: parseInt(process.env.DB_PORT || process.env.MYSQLPORT || '3306', 10),
     USER: process.env.DB_USER || process.env.MYSQLUSER || 'root',
     PASSWORD: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : (process.env.MYSQLPASSWORD !== undefined ? process.env.MYSQLPASSWORD : ''),
-    NAME: process.env.DB_NAME || process.env.MYSQLDATABASE || 'cribsociety_coffee',
+    NAME: process.env.DB_NAME || process.env.MYSQLDATABASE || 'railway',
     URL: process.env.DATABASE_URL || process.env.MYSQL_URL || null,
   },
   JWT: {

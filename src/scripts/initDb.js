@@ -29,10 +29,10 @@ async function initDatabase() {
 
     let sqlContent = fs.readFileSync(sqlFilePath, 'utf8');
 
-    // If a custom DB name is used (e.g. Railway's default 'railway' or other DB name)
-    const targetDb = config.DB.NAME || 'cribsociety_coffee';
-    if (targetDb !== 'cribsociety_coffee') {
-      sqlContent = sqlContent.replace(/cribsociety_coffee/g, targetDb);
+    // If a custom DB name is used (e.g. Railway's default 'railway' or custom name)
+    const targetDb = config.DB.NAME || 'railway';
+    if (targetDb !== 'railway') {
+      sqlContent = sqlContent.replace(/`railway`/g, `\`${targetDb}\``);
     }
 
     console.log(`[DB Init] Executing schema and seeds for database "${targetDb}"...`);
