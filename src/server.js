@@ -1,6 +1,7 @@
 const app = require('./app');
 const config = require('./config/env');
-const { testConnection } = require('./config/db');
+const { testConnection, pool } = require('./config/db');
+const initDatabase = require('./scripts/initDb');
 
 async function startServer() {
   console.log('====================================================');
@@ -9,7 +10,20 @@ async function startServer() {
 
   const isDbConnected = await testConnection();
   if (!isDbConnected) {
-    console.warn('[Warning] MySQL connection could not be established immediately. Ensure MySQL is running on port ' + config.DB.PORT);
+    console.warn('[Warning] MySQL connection could not be established immediately. Verify your DB environment variables (DATABASE_URL / MYSQLHOST).');
+  } else {
+    // Auto-initialize tables and seeds if not already created
+    try {
+      const [tables] = await pool.query("SHOW TABLES LIKE 'users'");
+      if (tables.length === 0) {
+        console.log('[Server] Database tables not found. Automatically running schema & seeds initialization...');
+        await initDatabase();
+      } else {
+        console.log('[Server] Database schema is verified and ready.');
+      }
+    } catch (err) {
+      console.warn('[Server] Auto-schema check notice:', err.message);
+    }
   }
 
   const server = app.listen(config.PORT, () => {

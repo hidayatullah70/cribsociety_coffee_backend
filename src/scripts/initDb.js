@@ -41,7 +41,10 @@ async function initDatabase() {
     console.log(`✅ [DB Init] Database "${targetDb}" schema and seeds initialized successfully!`);
   } catch (error) {
     console.error('❌ [DB Init] Failed to initialize database:', error.message);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    }
+    throw error;
   } finally {
     if (connection) {
       await connection.end();
