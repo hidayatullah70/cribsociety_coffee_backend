@@ -4,23 +4,33 @@ const mysql = require('mysql2/promise');
 const config = require('../config/env');
 
 async function initDatabase() {
-  console.log('[DB Init] Starting database initialization...');
+  console.log('[DB Init] Starting database schema & seed initialization...');
   console.log(`[DB Init] Connecting to MySQL at ${config.DB.HOST}:${config.DB.PORT} with user "${config.DB.USER}"...`);
 
   let connection;
   try {
-    // Connect with URI or parameters
-    const connectionConfig = config.DB.URL
-      ? { uri: config.DB.URL, multipleStatements: true }
-      : {
-          host: config.DB.HOST,
-          port: config.DB.PORT,
-          user: config.DB.USER,
-          password: config.DB.PASSWORD,
-          multipleStatements: true,
-        };
-
-    connection = await mysql.createConnection(connectionConfig);
+    // Try connecting with specific database first
+    try {
+      connection = await mysql.createConnection({
+        host: config.DB.HOST,
+        port: config.DB.PORT,
+        user: config.DB.USER,
+        password: config.DB.PASSWORD,
+        database: config.DB.NAME,
+        multipleStatements: true,
+        connectTimeout: 10000,
+      });
+    } catch (err) {
+      // If connecting to specific database fails, connect without database to create it
+      connection = await mysql.createConnection({
+        host: config.DB.HOST,
+        port: config.DB.PORT,
+        user: config.DB.USER,
+        password: config.DB.PASSWORD,
+        multipleStatements: true,
+        connectTimeout: 10000,
+      });
+    }
 
     const sqlFilePath = path.resolve(__dirname, '../../database/database.sql');
     if (!fs.existsSync(sqlFilePath)) {
@@ -29,13 +39,14 @@ async function initDatabase() {
 
     let sqlContent = fs.readFileSync(sqlFilePath, 'utf8');
 
-    // If a custom DB name is used (e.g. Railway's default 'railway' or custom name)
     const targetDb = config.DB.NAME || 'railway';
     if (targetDb !== 'railway') {
       sqlContent = sqlContent.replace(/`railway`/g, `\`${targetDb}\``);
     }
 
     console.log(`[DB Init] Executing schema and seeds for database "${targetDb}"...`);
+    
+    // Execute SQL script
     await connection.query(sqlContent);
 
     console.log(`✅ [DB Init] Database "${targetDb}" schema and seeds initialized successfully!`);

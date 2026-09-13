@@ -10,12 +10,15 @@ const dashboardRoutes = require('./dashboardRoutes');
 const staffRoutes = require('./staffRoutes');
 const guestRoutes = require('./guestRoutes');
 
+const { isDatabaseReady } = require('../config/db');
+
 // API Healthcheck
 router.get('/health', (req, res) => {
   res.status(200).json({
     status: 'UP',
     name: 'Crib Society Coffee API',
     version: '1.0.0',
+    database: isDatabaseReady() ? 'connected' : 'connecting',
     timestamp: new Date().toISOString(),
   });
 });
