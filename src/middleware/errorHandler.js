@@ -26,6 +26,10 @@ function errorHandler(err, req, res, next) {
     return sendError(res, 400, ERROR_CODES.BAD_REQUEST, 'Foreign key constraint violated');
   }
 
+  if (err.code === 'ER_NO_SUCH_TABLE') {
+    return sendError(res, 500, ERROR_CODES.INTERNAL_SERVER_ERROR, 'Database tables not initialized yet. Visit /api/v1/init-db to run initialization.', { mysqlCode: err.code });
+  }
+
   // Generic internal server error
   console.error('[Unhandled Error]', err);
 

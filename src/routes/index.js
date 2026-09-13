@@ -12,6 +12,8 @@ const guestRoutes = require('./guestRoutes');
 
 const { isDatabaseReady, testConnection } = require('../config/db');
 
+const initDatabase = require('../scripts/initDb');
+
 // API Healthcheck
 router.get('/health', async (req, res) => {
   let isReady = isDatabaseReady();
@@ -26,6 +28,25 @@ router.get('/health', async (req, res) => {
     database: isReady ? 'connected' : 'connecting',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Direct Web Database Initializer & Seeder
+router.get('/init-db', async (req, res, next) => {
+  try {
+    const result = await initDatabase();
+    res.status(200).json({
+      success: true,
+      message: 'Database schema & seeds created successfully!',
+      result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      code: error.code || 'DB_INIT_ERROR',
+    });
+  }
 });
 
 // Mount modules

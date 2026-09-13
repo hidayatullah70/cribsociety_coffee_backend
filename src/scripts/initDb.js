@@ -5,31 +5,40 @@ const config = require('../config/env');
 
 async function initDatabase() {
   console.log('[DB Init] Starting database schema & seed initialization...');
-  console.log(`[DB Init] Connecting to MySQL at ${config.DB.HOST}:${config.DB.PORT} with user "${config.DB.USER}"...`);
 
   let connection;
   try {
-    // Try connecting with specific database first
-    try {
+    if (config.DB.URL) {
+      console.log(`[DB Init] Connecting via DATABASE_URL...`);
       connection = await mysql.createConnection({
-        host: config.DB.HOST,
-        port: config.DB.PORT,
-        user: config.DB.USER,
-        password: config.DB.PASSWORD,
-        database: config.DB.NAME,
+        uri: config.DB.URL,
         multipleStatements: true,
-        connectTimeout: 10000,
+        connectTimeout: 15000,
+        ssl: config.DB.URL.includes('proxy.rlwy.net') ? { rejectUnauthorized: false } : undefined,
       });
-    } catch (err) {
-      // If connecting to specific database fails, connect without database to create it
-      connection = await mysql.createConnection({
-        host: config.DB.HOST,
-        port: config.DB.PORT,
-        user: config.DB.USER,
-        password: config.DB.PASSWORD,
-        multipleStatements: true,
-        connectTimeout: 10000,
-      });
+    } else {
+      console.log(`[DB Init] Connecting to MySQL at ${config.DB.HOST}:${config.DB.PORT} with user "${config.DB.USER}"...`);
+      try {
+        connection = await mysql.createConnection({
+          host: config.DB.HOST,
+          port: config.DB.PORT,
+          user: config.DB.USER,
+          password: config.DB.PASSWORD,
+          database: config.DB.NAME,
+          multipleStatements: true,
+          connectTimeout: 15000,
+          ssl: config.DB.HOST.includes('proxy.rlwy.net') ? { rejectUnauthorized: false } : undefined,
+        });
+      } catch (err) {
+        connection = await mysql.createConnection({
+          host: config.DB.HOST,
+          port: config.DB.PORT,
+          user: config.DB.USER,
+          password: config.DB.PASSWORD,
+          multipleStatements: true,
+          connectTimeout: 15000,
+        });
+      }
     }
 
     const sqlFilePath = path.resolve(__dirname, '../../database/database.sql');
@@ -50,6 +59,7 @@ async function initDatabase() {
     await connection.query(sqlContent);
 
     console.log(`✅ [DB Init] Database "${targetDb}" schema and seeds initialized successfully!`);
+    return { success: true, database: targetDb };
   } catch (error) {
     console.error('❌ [DB Init] Failed to initialize database:', error.message);
     if (require.main === module) {
