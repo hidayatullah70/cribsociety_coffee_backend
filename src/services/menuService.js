@@ -8,14 +8,25 @@ const { recordAuditLog } = require('../utils/auditLogger');
 // Categories
 // ------------------------------------------------------------------------------
 async function getCategories(includeInactive = false) {
-  let query = 'SELECT id, name, sort_order, is_active, created_at, updated_at FROM categories';
-  if (!includeInactive) {
-    query += ' WHERE is_active = TRUE';
-  }
-  query += ' ORDER BY sort_order ASC, name ASC';
+  try {
+    let query = 'SELECT id, name, sort_order, is_active, created_at, updated_at FROM categories';
+    if (!includeInactive) {
+      query += ' WHERE is_active = TRUE';
+    }
+    query += ' ORDER BY sort_order ASC, name ASC';
 
-  const [categories] = await pool.query(query);
-  return categories;
+    const [categories] = await pool.query(query);
+    return categories;
+  } catch (err) {
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      console.log('[MenuService] Tables missing. Auto-initializing database schema & seeds...');
+      const initDatabase = require('../scripts/initDb');
+      await initDatabase();
+      const [categories] = await pool.query('SELECT id, name, sort_order, is_active, created_at, updated_at FROM categories WHERE is_active = TRUE ORDER BY sort_order ASC, name ASC');
+      return categories;
+    }
+    throw err;
+  }
 }
 
 async function getCategoryById(id) {
@@ -128,108 +139,118 @@ async function createAddon({ name, price }, user) {
 // Products
 // ------------------------------------------------------------------------------
 async function getProducts({ categoryId, available, includeArchived = false }) {
-  let query = `
-    SELECT 
-      p.id, 
-      p.category_id AS categoryId, 
-      c.name AS categoryName,
-      p.name, 
-      p.description, 
-      p.price, 
-      p.available, 
-      p.low_stock_threshold AS lowStockThreshold, 
-      p.is_archived AS isArchived,
-      COALESCE(i.quantity, 0) AS stockQuantity,
-      p.created_at AS createdAt, 
-      p.updated_at AS updatedAt
-    FROM products p
-    JOIN categories c ON p.category_id = c.id
-    LEFT JOIN inventory i ON p.id = i.product_id
-    WHERE 1=1
-  `;
+  try {
+    let query = `
+      SELECT 
+        p.id, 
+        p.category_id AS categoryId, 
+        c.name AS categoryName,
+        p.name, 
+        p.description, 
+        p.price, 
+        p.available, 
+        p.low_stock_threshold AS lowStockThreshold, 
+        p.is_archived AS isArchived,
+        COALESCE(i.quantity, 0) AS stockQuantity,
+        p.created_at AS createdAt, 
+        p.updated_at AS updatedAt
+      FROM products p
+      JOIN categories c ON p.category_id = c.id
+      LEFT JOIN inventory i ON p.id = i.product_id
+      WHERE 1=1
+    `;
 
-  const values = [];
+    const values = [];
 
-  if (!includeArchived) {
-    query += ' AND p.is_archived = FALSE';
-  }
+    if (!includeArchived) {
+      query += ' AND p.is_archived = FALSE';
+    }
 
-  if (categoryId) {
-    query += ' AND p.category_id = ?';
-    values.push(categoryId);
-  }
+    if (categoryId) {
+      query += ' AND p.category_id = ?';
+      values.push(categoryId);
+    }
 
-  if (available !== undefined && available !== null && available !== '') {
-    const isAvail = available === 'true' || available === true || available === '1' || available === 1;
-    query += ' AND p.available = ?';
-    values.push(isAvail);
-  }
+    if (available !== undefined && available !== null && available !== '') {
+      const isAvail = available === 'true' || available === true || available === '1' || available === 1;
+      query += ' AND p.available = ?';
+      values.push(isAvail);
+    }
 
-  query += ' ORDER BY c.sort_order ASC, p.name ASC';
+    query += ' ORDER BY c.sort_order ASC, p.name ASC';
 
-  const [products] = await pool.query(query, values);
+    const [products] = await pool.query(query, values);
 
-  if (products.length === 0) {
-    return [];
-  }
+    if (products.length === 0) {
+      return [];
+    }
 
-  const productIds = products.map(p => p.id);
+    const productIds = products.map(p => p.id);
 
-  // Fetch all variants for these products
-  const [variants] = await pool.query(
-    `SELECT id, product_id AS productId, name, price_delta AS priceDelta, is_active AS isActive 
-     FROM product_variants 
-     WHERE product_id IN (?) AND is_active = TRUE 
-     ORDER BY price_delta ASC`,
-    [productIds]
-  );
+    // Fetch all variants for these products
+    const [variants] = await pool.query(
+      `SELECT id, product_id AS productId, name, price_delta AS priceDelta, is_active AS isActive 
+       FROM product_variants 
+       WHERE product_id IN (?) AND is_active = TRUE 
+       ORDER BY price_delta ASC`,
+      [productIds]
+    );
 
-  // Fetch all addons for these products
-  const [productAddons] = await pool.query(
-    `SELECT pa.product_id AS productId, a.id, a.name, a.price, a.is_active AS isActive
-     FROM product_addons pa
-     JOIN addons a ON pa.addon_id = a.id
-     WHERE pa.product_id IN (?) AND a.is_active = TRUE
-     ORDER BY a.name ASC`,
-    [productIds]
-  );
+    // Fetch all addons for these products
+    const [productAddons] = await pool.query(
+      `SELECT pa.product_id AS productId, a.id, a.name, a.price, a.is_active AS isActive
+       FROM product_addons pa
+       JOIN addons a ON pa.addon_id = a.id
+       WHERE pa.product_id IN (?) AND a.is_active = TRUE
+       ORDER BY a.name ASC`,
+      [productIds]
+    );
 
-  const variantsByProduct = {};
-  variants.forEach(v => {
-    if (!variantsByProduct[v.productId]) variantsByProduct[v.productId] = [];
-    variantsByProduct[v.productId].push({
-      id: v.id,
-      name: v.name,
-      priceDelta: Number(v.priceDelta),
+    const variantsByProduct = {};
+    variants.forEach(v => {
+      if (!variantsByProduct[v.productId]) variantsByProduct[v.productId] = [];
+      variantsByProduct[v.productId].push({
+        id: v.id,
+        name: v.name,
+        priceDelta: Number(v.priceDelta),
+      });
     });
-  });
 
-  const addonsByProduct = {};
-  productAddons.forEach(a => {
-    if (!addonsByProduct[a.productId]) addonsByProduct[a.productId] = [];
-    addonsByProduct[a.productId].push({
-      id: a.id,
-      name: a.name,
-      price: Number(a.price),
+    const addonsByProduct = {};
+    productAddons.forEach(a => {
+      if (!addonsByProduct[a.productId]) addonsByProduct[a.productId] = [];
+      addonsByProduct[a.productId].push({
+        id: a.id,
+        name: a.name,
+        price: Number(a.price),
+      });
     });
-  });
 
-  return products.map(p => ({
-    id: p.id,
-    categoryId: p.categoryId,
-    categoryName: p.categoryName,
-    name: p.name,
-    description: p.description,
-    price: Number(p.price),
-    available: Boolean(p.available),
-    lowStockThreshold: p.lowStockThreshold !== null ? Number(p.lowStockThreshold) : null,
-    stockQuantity: Number(p.stockQuantity),
-    isArchived: Boolean(p.isArchived),
-    variants: variantsByProduct[p.id] || [],
-    addons: addonsByProduct[p.id] || [],
-    createdAt: p.createdAt,
-    updatedAt: p.updatedAt,
-  }));
+    return products.map(p => ({
+      id: p.id,
+      categoryId: p.categoryId,
+      categoryName: p.categoryName,
+      name: p.name,
+      description: p.description,
+      price: Number(p.price),
+      available: Boolean(p.available),
+      lowStockThreshold: p.lowStockThreshold !== null ? Number(p.lowStockThreshold) : null,
+      stockQuantity: Number(p.stockQuantity),
+      isArchived: Boolean(p.isArchived),
+      variants: variantsByProduct[p.id] || [],
+      addons: addonsByProduct[p.id] || [],
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+    }));
+  } catch (err) {
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      console.log('[MenuService] Tables missing in getProducts. Auto-initializing...');
+      const initDatabase = require('../scripts/initDb');
+      await initDatabase();
+      return getProducts({ categoryId, available, includeArchived });
+    }
+    throw err;
+  }
 }
 
 async function getProductById(id, includeArchived = true) {
