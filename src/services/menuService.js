@@ -148,6 +148,7 @@ async function getProducts({ categoryId, available, includeArchived = false }) {
         p.name, 
         p.description, 
         p.price, 
+        p.image_url AS imageUrl,
         p.available, 
         p.low_stock_threshold AS lowStockThreshold, 
         p.is_archived AS isArchived,
@@ -233,6 +234,7 @@ async function getProducts({ categoryId, available, includeArchived = false }) {
       name: p.name,
       description: p.description,
       price: Number(p.price),
+      imageUrl: p.imageUrl || null,
       available: Boolean(p.available),
       lowStockThreshold: p.lowStockThreshold !== null ? Number(p.lowStockThreshold) : null,
       stockQuantity: Number(p.stockQuantity),
@@ -262,6 +264,7 @@ async function getProductById(id, includeArchived = true) {
       p.name, 
       p.description, 
       p.price, 
+      p.image_url AS imageUrl,
       p.available, 
       p.low_stock_threshold AS lowStockThreshold, 
       p.is_archived AS isArchived,
@@ -308,6 +311,7 @@ async function getProductById(id, includeArchived = true) {
     name: product.name,
     description: product.description,
     price: Number(product.price),
+    imageUrl: product.imageUrl || null,
     available: Boolean(product.available),
     lowStockThreshold: product.lowStockThreshold !== null ? Number(product.lowStockThreshold) : null,
     stockQuantity: Number(product.stockQuantity),
@@ -325,6 +329,7 @@ async function createProduct(productData, user) {
     name,
     description = null,
     price,
+    imageUrl = null,
     available = true,
     lowStockThreshold = 5,
     initialStock = 0,
@@ -347,9 +352,9 @@ async function createProduct(productData, user) {
 
     // 1. Insert product
     await connection.query(
-      `INSERT INTO products (id, category_id, name, description, price, available, low_stock_threshold, is_archived)
-       VALUES (?, ?, ?, ?, ?, ?, ?, FALSE)`,
-      [productId, categoryId, name.trim(), description, price, available, lowStockThreshold]
+      `INSERT INTO products (id, category_id, name, description, price, image_url, available, low_stock_threshold, is_archived)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE)`,
+      [productId, categoryId, name.trim(), description, price, imageUrl, available, lowStockThreshold]
     );
 
     // 2. Insert initial inventory
@@ -421,6 +426,7 @@ async function updateProduct(id, updateData, user) {
     name,
     description,
     price,
+    imageUrl,
     available,
     lowStockThreshold,
     variants,
@@ -445,6 +451,10 @@ async function updateProduct(id, updateData, user) {
     if (description !== undefined) {
       updates.push('description = ?');
       values.push(description);
+    }
+    if (imageUrl !== undefined) {
+      updates.push('image_url = ?');
+      values.push(imageUrl);
     }
     if (price !== undefined) {
       if (price < 0) throw new ApiError(400, ERROR_CODES.VALIDATION_ERROR, 'Price must be non-negative');

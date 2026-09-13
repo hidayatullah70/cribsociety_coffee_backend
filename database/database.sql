@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
 
 -- ------------------------------------------------------------------------------
 -- Table: products
--- Catalog products with pricing and stock thresholds
+-- Catalog products with pricing, image, and stock thresholds
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `products` (
     `id` VARCHAR(36) NOT NULL,
@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `products` (
     `name` VARCHAR(150) NOT NULL,
     `description` TEXT NULL,
     `price` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+    `image_url` VARCHAR(500) NULL,
     `available` BOOLEAN NOT NULL DEFAULT TRUE,
     `low_stock_threshold` INT NULL DEFAULT 5,
     `is_archived` BOOLEAN NOT NULL DEFAULT FALSE,
@@ -102,16 +103,17 @@ CREATE TABLE IF NOT EXISTS `addons` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------------------------
--- Table: product_addons
--- Many-to-Many junction between products and permitted addons
+-- Table: product_addons (Junction)
+-- M:N link between products and valid addons
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `product_addons` (
     `product_id` VARCHAR(36) NOT NULL,
     `addon_id` VARCHAR(36) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`product_id`, `addon_id`),
-    CONSTRAINT `fk_prod_addons_product` FOREIGN KEY (`product_id`) 
+    CONSTRAINT `fk_product_addons_product` FOREIGN KEY (`product_id`) 
         REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `fk_prod_addons_addon` FOREIGN KEY (`addon_id`) 
+    CONSTRAINT `fk_product_addons_addon` FOREIGN KEY (`addon_id`) 
         REFERENCES `addons` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     KEY `idx_product_addons_addon_id` (`addon_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -272,6 +274,10 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
     KEY `idx_audit_logs_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ==============================================================================
+-- SEED DATA
+-- ==============================================================================
+
 -- ------------------------------------------------------------------------------
 -- Users Seed (Password: 'password123' bcrypt hash)
 -- ------------------------------------------------------------------------------
@@ -281,128 +287,211 @@ INSERT IGNORE INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `is_
 ('usr_staff_02', 'Cashier Dimas', 'dimas@cribsociety.coffee', '$2b$10$J9DVVjXaH2TL0U8iMbvJLOi7ABoRTfXcWqZri.VvfoqTZZ92Ht68y', 'staff', TRUE);
 
 -- ------------------------------------------------------------------------------
--- Categories Seed
+-- Categories Seed (Synchronized with Landing Page Menu)
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `categories` (`id`, `name`, `sort_order`, `is_active`) VALUES
-('cat_signature', 'Signature Coffee', 1, TRUE),
-('cat_espresso',  'Espresso & Classic', 2, TRUE),
-('cat_non_coffee','Non-Coffee & Refreshers', 3, TRUE),
-('cat_pastry',    'Pastry & Bites', 4, TRUE);
+('cat_signature_coffee', 'Signature Coffee', 1, TRUE),
+('cat_coffee',           'Coffee',           2, TRUE),
+('cat_non_coffee',       'Non Coffee',       3, TRUE),
+('cat_food',             'Food',             4, TRUE),
+('cat_matcha_yakult',    'Matcha & Yakult',  5, TRUE),
+('cat_snack',            'Snack',            6, TRUE),
+('cat_addon',            'Add On',           7, TRUE);
 
 -- ------------------------------------------------------------------------------
 -- Products Seed
 -- ------------------------------------------------------------------------------
-INSERT IGNORE INTO `products` (`id`, `category_id`, `name`, `description`, `price`, `available`, `low_stock_threshold`, `is_archived`) VALUES
-('prod_crib_aren',      'cat_signature',  'Crib Aren Latte', 'Signature espresso, fresh milk, and organic aren palm sugar.', 28000.00, TRUE, 10, FALSE),
-('prod_butterscotch',   'cat_signature',  'Butterscotch Sea Salt Latte', 'Double espresso, rich butterscotch caramel, and sea salt foam.', 34000.00, TRUE, 10, FALSE),
-('prod_coco_cappuccino', 'cat_signature', 'Toasted Coconut Cappuccino', 'Velvety microfoam cappuccino infused with toasted coconut syrup.', 32000.00, TRUE, 8, FALSE),
-('prod_espresso',       'cat_espresso',   'Double Espresso', 'Rich and intense double shot extracted from 100% Arabica beans.', 20000.00, TRUE, 15, FALSE),
-('prod_americano',      'cat_espresso',   'Iced Americano', 'Smooth double espresso diluted with purified cold water and ice.', 24000.00, TRUE, 15, FALSE),
-('prod_latte',          'cat_espresso',   'Caffe Latte', 'Espresso balanced with steamed milk and a thin layer of foam.', 28000.00, TRUE, 15, FALSE),
-('prod_matcha_latte',   'cat_non_coffee', 'Matcha Oat Latte', 'Ceremonial Uji matcha whisked with creamy oat milk.', 32000.00, TRUE, 10, FALSE),
-('prod_berry_fizz',     'cat_non_coffee', 'Wild Berry Soda Fizz', 'Refreshing sparkling soda infused with natural berry reduction and mint.', 26000.00, TRUE, 8, FALSE),
-('prod_artisanal_tea',  'cat_non_coffee', 'Earl Grey Lavender Tea', 'Premium whole-leaf black tea scented with French lavender blossoms.', 22000.00, TRUE, 10, FALSE),
-('prod_croissant',      'cat_pastry',     'Artisan Butter Croissant', 'Flaky, buttery multi-layered traditional French croissant baked fresh daily.', 25000.00, TRUE, 5, FALSE),
-('prod_fudge_brownie',  'cat_pastry',     'Sea Salt Fudge Brownie', 'Decadent dark chocolate brownie with a sprinkle of Maldon sea salt.', 22000.00, TRUE, 5, FALSE),
-('prod_cinnamon_roll',  'cat_pastry',     'Cream Cheese Cinnamon Roll', 'Warm fluffy brioche rolled with cinnamon brown sugar, topped with cream cheese glaze.', 28000.00, TRUE, 5, FALSE);
+INSERT IGNORE INTO `products` (`id`, `category_id`, `name`, `description`, `price`, `image_url`, `available`, `low_stock_threshold`, `is_archived`) VALUES
+-- 1. Signature Coffee
+('prod_crib_signature',        'cat_signature_coffee', 'Crib Signature Palm Latte', 'Double shot slow-extracted espresso, creamy oat blend, infused with organic palm nectar & sea salt froth.', 35000.00, 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_matcha_espresso_dirty', 'cat_signature_coffee', 'Matcha Espresso Dirty', 'Ceremonial grade Uji matcha bottom layer topped with chilled fresh milk and a floating hot espresso shot.', 38000.00, 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&q=80&w=600', TRUE, 8, FALSE),
+('prod_tokyo_dark_americano',  'cat_signature_coffee', 'Tokyo Dark Iced Americano', 'Crisp, citrusy washed Ethiopian beans pulled over crystal rock ice with subtle orange twist aroma.', 28000.00, 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&q=80&w=600', TRUE, 15, FALSE),
+('prod_spanish_cinnamon_latte','cat_signature_coffee', 'Spanish Cinnamon Latte', 'Sweet condensed milk foundation layered with bold dark roast and freshly ground Ceylon cinnamon.', 34000.00, 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+
+-- 2. Coffee
+('prod_velvet_flat_white',     'cat_coffee',           'Velvet Flat White', 'Double ristretto with micro-foamed whole milk creating a glossy velvet texture and balanced body.', 32000.00, 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_classic_cappuccino',    'cat_coffee',           'Classic Italian Cappuccino', 'Equal parts rich espresso, steamed milk, and thick velvety microfoam dusted with raw cacao powder.', 30000.00, 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_v60_filter',            'cat_coffee',           'V60 Single Origin Filter', 'Hand-poured floral Ethiopian Yirgacheffe with notes of bergamot, peach sweetness, and jasmine.', 38000.00, 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
+('prod_vanilla_cold_brew',     'cat_coffee',           'Vanilla Sweet Cold Brew', '18-hour cold-steeped Arabica coffee topped with a splash of sweet vanilla-infused cream.', 33000.00, 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+
+-- 3. Non Coffee
+('prod_artisan_dark_chocolate','cat_non_coffee',       'Artisan Dark Chocolate', '70% Single-origin Indonesian cocoa blended with steamed fresh milk and organic brown sugar.', 32000.00, 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&q=80&w=600', TRUE, 8, FALSE),
+('prod_earl_grey_milk_tea',    'cat_non_coffee',       'Royal Earl Grey Milk Tea', 'Fragrant citrusy bergamot black tea steeped rich, shaken with creamy fresh milk and wildflower honey.', 28000.00, 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_sparkling_berry_hibiscus','cat_non_coffee',     'Sparkling Berry Hibiscus', 'Refreshing cold-brewed crimson hibiscus tea paired with muddled berries, mint, and sparkling soda.', 30000.00, 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+
+-- 4. Food
+('prod_truffle_beef_bowl',     'cat_food',             'Truffle Beef Gyudon Bowl', 'Tender sliced Australian beef sautéed in aromatic truffle soy sauce over Japanese rice with onsen egg.', 48000.00, 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
+('prod_creamy_carbonara',      'cat_food',             'Smoked Beef Carbonara', 'Al dente spaghetti tossed in rich parmesan egg yolk sauce, crispy smoked beef bacon, and black pepper.', 45000.00, 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
+('prod_crispy_chicken_matah',  'cat_food',             'Crispy Chicken Sambal Matah', 'Crispy golden chicken karaage bites served on warm steamed rice with spicy fragrant Balinese sambal matah.', 42000.00, 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&q=80&w=600', TRUE, 6, FALSE),
+
+-- 5. Matcha & Yakult
+('prod_uji_matcha_latte',      'cat_matcha_yakult',    'Kyoto Uji Matcha Cloud', 'Ceremonial grade Kyoto Uji matcha whisked fresh with velvety milk and delicate foam layer.', 36000.00, 'https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_strawberry_matcha_latte','cat_matcha_yakult',   'Strawberry Matcha Fusion', 'Sweet chunky strawberry compote layered with cold whole milk and topped with rich emerald Uji matcha.', 38000.00, 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&q=80&w=600', TRUE, 8, FALSE),
+('prod_lychee_yakult_breeze',  'cat_matcha_yakult',    'Lychee Yakult Breeze', 'Whole juicy lychee fruit muddled with probiotic Yakult and chilled sparkling soda over ice.', 29000.00, 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_mango_yakult_cooler',   'cat_matcha_yakult',    'Mango Yakult Cooler', 'Ripe tropical mango nectar blended with creamy probiotic Yakult and crushed mint ice.', 29000.00, 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+
+-- 6. Snack
+('prod_truffle_fries',         'cat_snack',            'Truffle Parmesan Fries', 'Crispy shoestring golden fries tossed in white truffle oil, Himalayan pink salt, and grated parmesan.', 26000.00, 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+('prod_french_croissant',      'cat_snack',            'French Butter Croissant', '36-layer fermented French AOP butter pastry, baked golden flaky crisp every morning.', 24000.00, 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
+('prod_crispy_chicken_tenders','cat_snack',            'Crispy Chicken Tenders', 'Juicy buttermilk marinated chicken tenders fried golden crisp, served with house dipping sauce.', 32000.00, 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&q=80&w=600', TRUE, 6, FALSE),
+('prod_pain_au_chocolat',      'cat_snack',            'Valrhona Pain au Chocolat', 'Golden laminated dough with two batons of 64% Valrhona French dark chocolate.', 28000.00, 'https://images.unsplash.com/photo-1530610476181-d83430b64dcd?auto=format&fit=crop&q=80&w=600', TRUE, 6, FALSE),
+
+-- 7. Add On
+('prod_addon_espresso_shot',   'cat_addon',            'Extra Espresso Shot', 'Additional fresh double shot extracted from our signature house blend coffee beans.', 6000.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600', TRUE, 20, FALSE),
+('prod_addon_oat_milk',        'cat_addon',            'Oat Milk Barista Upgrade', 'Swap regular dairy milk with silky, creamy Oatly Barista Edition oat milk.', 7000.00, 'https://images.unsplash.com/photo-1588710929895-6ef7d87a93a6?auto=format&fit=crop&q=80&w=600', TRUE, 15, FALSE),
+('prod_addon_sea_salt_foam',   'cat_addon',            'Sea Salt Cold Foam', 'Thick velvety whipped cold foam sprinkled with fine Himalayan pink sea salt.', 8000.00, 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', TRUE, 15, FALSE),
+('prod_addon_flavor_syrup',    'cat_addon',            'Artisan Flavored Syrup', 'Extra pumps of Madagascar Vanilla, Salted Caramel, or Hazelnut artisanal syrup.', 5000.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600', TRUE, 20, FALSE);
 
 -- ------------------------------------------------------------------------------
 -- Product Variants Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `product_variants` (`id`, `product_id`, `name`, `price_delta`, `is_active`) VALUES
-('var_aren_reg',   'prod_crib_aren',    'Regular (12oz)', 0.00, TRUE),
-('var_aren_large', 'prod_crib_aren',    'Large (16oz)', 6000.00, TRUE),
-('var_butter_reg',   'prod_butterscotch', 'Regular (12oz)', 0.00, TRUE),
-('var_butter_large', 'prod_butterscotch', 'Large (16oz)', 6000.00, TRUE),
-('var_latte_hot',  'prod_latte',        'Hot (8oz)', 0.00, TRUE),
-('var_latte_iced', 'prod_latte',        'Iced (12oz)', 2000.00, TRUE),
-('var_matcha_hot',  'prod_matcha_latte', 'Hot (8oz)', 0.00, TRUE),
-('var_matcha_iced', 'prod_matcha_latte', 'Iced (12oz)', 2000.00, TRUE);
+('var_crib_iced',       'prod_crib_signature',         'Iced (16oz)', 0.00, TRUE),
+('var_crib_hot',        'prod_crib_signature',         'Hot (12oz)', 0.00, TRUE),
+('var_crib_large',      'prod_crib_signature',         'Iced Large (22oz)', 6000.00, TRUE),
+('var_dirty_std',       'prod_matcha_espresso_dirty',  'Iced Dirty (Standard)', 0.00, TRUE),
+('var_tokyo_iced',      'prod_tokyo_dark_americano',   'Iced (16oz)', 0.00, TRUE),
+('var_tokyo_hot',       'prod_tokyo_dark_americano',   'Hot (10oz)', 0.00, TRUE),
+('var_spanish_iced',    'prod_spanish_cinnamon_latte', 'Iced (16oz)', 0.00, TRUE),
+('var_spanish_hot',     'prod_spanish_cinnamon_latte', 'Hot (12oz)', 0.00, TRUE),
+('var_flat_white_std',  'prod_velvet_flat_white',      'Hot (8oz Standard)', 0.00, TRUE),
+('var_capp_hot',        'prod_classic_cappuccino',     'Hot (8oz)', 0.00, TRUE),
+('var_capp_iced',       'prod_classic_cappuccino',     'Iced (16oz)', 0.00, TRUE),
+('var_v60_hot',         'prod_v60_filter',             'Hot Pour Over', 0.00, TRUE),
+('var_v60_iced',        'prod_v60_filter',             'Japanese Flash Iced', 3000.00, TRUE),
+('var_coldbrew_iced',   'prod_vanilla_cold_brew',      'Iced (16oz)', 0.00, TRUE),
+('var_choco_iced',      'prod_artisan_dark_chocolate', 'Iced (16oz)', 0.00, TRUE),
+('var_choco_hot',       'prod_artisan_dark_chocolate', 'Hot (12oz)', 0.00, TRUE),
+('var_earl_iced',       'prod_earl_grey_milk_tea',     'Iced (16oz)', 0.00, TRUE),
+('var_earl_hot',        'prod_earl_grey_milk_tea',     'Hot (12oz)', 0.00, TRUE),
+('var_hibiscus_iced',   'prod_sparkling_berry_hibiscus','Iced (16oz)', 0.00, TRUE),
+('var_gyudon_reg',      'prod_truffle_beef_bowl',      'Regular Portion', 0.00, TRUE),
+('var_gyudon_large',    'prod_truffle_beef_bowl',      'Large Beef (+50g)', 12000.00, TRUE),
+('var_carbonara_std',   'prod_creamy_carbonara',       'Standard Portion', 0.00, TRUE),
+('var_chicken_med',     'prod_crispy_chicken_matah',   'Medium Spicy', 0.00, TRUE),
+('var_chicken_extra',   'prod_crispy_chicken_matah',   'Extra Spicy', 0.00, TRUE),
+('var_matcha_iced',     'prod_uji_matcha_latte',       'Iced (16oz)', 0.00, TRUE),
+('var_matcha_hot',      'prod_uji_matcha_latte',       'Hot (12oz)', 0.00, TRUE),
+('var_straw_matcha',    'prod_strawberry_matcha_latte','Iced (16oz)', 0.00, TRUE),
+('var_lychee_breeze',   'prod_lychee_yakult_breeze',   'Iced (16oz)', 0.00, TRUE),
+('var_mango_cooler',    'prod_mango_yakult_cooler',    'Iced (16oz)', 0.00, TRUE),
+('var_fries_std',       'prod_truffle_fries',          'Standard Basket', 0.00, TRUE),
+('var_croissant_warm',  'prod_french_croissant',       'Warmed Up', 0.00, TRUE),
+('var_croissant_room',  'prod_french_croissant',       'Room Temperature', 0.00, TRUE),
+('var_tenders_basket',  'prod_crispy_chicken_tenders', '6 pcs Basket', 0.00, TRUE),
+('var_pain_warm',       'prod_pain_au_chocolat',       'Warmed Up', 0.00, TRUE),
+('var_pain_room',       'prod_pain_au_chocolat',       'Room Temperature', 0.00, TRUE);
 
 -- ------------------------------------------------------------------------------
 -- Addons Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `addons` (`id`, `name`, `price`, `is_active`) VALUES
-('add_extra_espresso', 'Extra Espresso Shot', 6000.00, TRUE),
-('add_oat_milk',       'Swap to Oat Milk', 7000.00, TRUE),
-('add_almond_milk',    'Swap to Almond Milk', 8000.00, TRUE),
-('add_vanilla_syrup',  'Vanilla Syrup Pump', 4000.00, TRUE),
-('add_caramel_drizzle','Salted Caramel Drizzle', 5000.00, TRUE),
-('add_ice_cream_scoop','Vanilla Ice Cream Scoop', 8000.00, TRUE);
+('add_extra_shot',      'Extra Espresso Shot',    6000.00, TRUE),
+('add_oat_milk',        'Sub Oat Milk',           7000.00, TRUE),
+('add_sea_salt_foam',   'Sea Salt Cold Foam',     8000.00, TRUE),
+('add_extra_matcha',    'Extra Uji Matcha Layer', 8000.00, TRUE),
+('add_tonic_splash',    'Tonic Water Splash',     5000.00, TRUE),
+('add_whipped_cream',   'Whipped Cream',          5000.00, TRUE),
+('add_strawberry_jam',  'House Strawberry Jam',   4000.00, TRUE),
+('add_butter_pad',      'Extra Salted Butter',    4000.00, TRUE),
+('add_extra_egg',       'Extra Onsen Egg',        6000.00, TRUE),
+('add_extra_cheese',    'Extra Parmesan Cheese',  5000.00, TRUE),
+('add_extra_matah',     'Extra Sambal Matah',     4000.00, TRUE);
 
 -- ------------------------------------------------------------------------------
 -- Product Addons Seed (Junction)
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `product_addons` (`product_id`, `addon_id`) VALUES
-('prod_crib_aren', 'add_extra_espresso'),
-('prod_crib_aren', 'add_oat_milk'),
-('prod_crib_aren', 'add_almond_milk'),
-('prod_crib_aren', 'add_caramel_drizzle'),
-('prod_butterscotch', 'add_extra_espresso'),
-('prod_butterscotch', 'add_oat_milk'),
-('prod_butterscotch', 'add_caramel_drizzle'),
-('prod_latte', 'add_extra_espresso'),
-('prod_latte', 'add_oat_milk'),
-('prod_latte', 'add_almond_milk'),
-('prod_latte', 'add_vanilla_syrup'),
-('prod_matcha_latte', 'add_extra_espresso'),
-('prod_matcha_latte', 'add_vanilla_syrup'),
-('prod_matcha_latte', 'add_ice_cream_scoop'),
-('prod_fudge_brownie', 'add_ice_cream_scoop'),
-('prod_croissant',     'add_caramel_drizzle');
+('prod_crib_signature',        'add_extra_shot'),
+('prod_crib_signature',        'add_oat_milk'),
+('prod_crib_signature',        'add_sea_salt_foam'),
+('prod_matcha_espresso_dirty', 'add_extra_shot'),
+('prod_matcha_espresso_dirty', 'add_extra_matcha'),
+('prod_tokyo_dark_americano',  'add_extra_shot'),
+('prod_tokyo_dark_americano',  'add_tonic_splash'),
+('prod_spanish_cinnamon_latte','add_extra_shot'),
+('prod_spanish_cinnamon_latte','add_whipped_cream'),
+('prod_velvet_flat_white',     'add_oat_milk'),
+('prod_velvet_flat_white',     'add_extra_shot'),
+('prod_classic_cappuccino',    'add_extra_shot'),
+('prod_artisan_dark_chocolate','add_oat_milk'),
+('prod_artisan_dark_chocolate','add_sea_salt_foam'),
+('prod_truffle_beef_bowl',     'add_extra_egg'),
+('prod_creamy_carbonara',      'add_extra_cheese'),
+('prod_crispy_chicken_matah',  'add_extra_matah'),
+('prod_uji_matcha_latte',      'add_oat_milk'),
+('prod_uji_matcha_latte',      'add_sea_salt_foam'),
+('prod_strawberry_matcha_latte','add_oat_milk'),
+('prod_french_croissant',      'add_strawberry_jam'),
+('prod_french_croissant',      'add_butter_pad');
 
 -- ------------------------------------------------------------------------------
 -- Inventory Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `inventory` (`product_id`, `quantity`) VALUES
-('prod_crib_aren',       45),
-('prod_butterscotch',    30),
-('prod_coco_cappuccino', 25),
-('prod_espresso',        100),
-('prod_americano',       80),
-('prod_latte',           50),
-('prod_matcha_latte',    35),
-('prod_berry_fizz',      20),
-('prod_artisanal_tea',   40),
-('prod_croissant',       12),
-('prod_fudge_brownie',   8),
-('prod_cinnamon_roll',   15);
+('prod_crib_signature',        45),
+('prod_matcha_espresso_dirty', 25),
+('prod_tokyo_dark_americano',  80),
+('prod_spanish_cinnamon_latte',28),
+('prod_velvet_flat_white',     50),
+('prod_classic_cappuccino',    40),
+('prod_v60_filter',            22),
+('prod_vanilla_cold_brew',     35),
+('prod_artisan_dark_chocolate',30),
+('prod_earl_grey_milk_tea',    35),
+('prod_sparkling_berry_hibiscus',40),
+('prod_truffle_beef_bowl',     20),
+('prod_creamy_carbonara',      18),
+('prod_crispy_chicken_matah',  25),
+('prod_uji_matcha_latte',      34),
+('prod_strawberry_matcha_latte',25),
+('prod_lychee_yakult_breeze',  40),
+('prod_mango_yakult_cooler',   35),
+('prod_truffle_fries',         40),
+('prod_french_croissant',      14),
+('prod_crispy_chicken_tenders',22),
+('prod_pain_au_chocolat',      4),
+('prod_addon_espresso_shot',   100),
+('prod_addon_oat_milk',        80),
+('prod_addon_sea_salt_foam',   60),
+('prod_addon_flavor_syrup',    90);
 
 -- ------------------------------------------------------------------------------
 -- Inventory Adjustments Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `inventory_adjustments` (`id`, `product_id`, `actor_user_id`, `previous_quantity`, `adjustment_quantity`, `resulting_quantity`, `reason`) VALUES
-('adj_init_01', 'prod_crib_aren',     'usr_owner_01', 0, 45,  45,  'Initial stock inbound for opening'),
-('adj_init_02', 'prod_butterscotch',  'usr_owner_01', 0, 30,  30,  'Initial stock inbound for opening'),
-('adj_init_03', 'prod_croissant',     'usr_owner_01', 0, 12,  12,  'Morning fresh bakery delivery'),
-('adj_init_04', 'prod_fudge_brownie', 'usr_owner_01', 0, 8,   8,   'Morning fresh bakery delivery');
+('adj_init_01', 'prod_crib_signature', 'usr_owner_01', 0, 45, 45, 'Initial stock inbound for opening'),
+('adj_init_02', 'prod_french_croissant', 'usr_owner_01', 0, 14, 14, 'Morning fresh bakery delivery'),
+('adj_init_03', 'prod_uji_matcha_latte', 'usr_owner_01', 0, 34, 34, 'Uji ceremonial stock inbound'),
+('adj_init_04', 'prod_truffle_beef_bowl', 'usr_owner_01', 0, 20, 20, 'Kitchen inventory preparation');
 
 -- ------------------------------------------------------------------------------
 -- Sample Orders Seed
 -- ------------------------------------------------------------------------------
-INSERT IGNORE INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
-('ord_sample_01', '#CSC-1001', 'completed', 'paid', 62000.00, 5000.00, 57000.00, 'usr_staff_01', NOW() - INTERVAL 2 HOUR),
-('ord_sample_02', '#CSC-1002', 'preparing', 'paid', 34000.00, 0.00, 34000.00, 'usr_staff_02', NOW() - INTERVAL 20 MINUTE),
-('ord_sample_03', '#CSC-1003', 'ready', 'paid', 54000.00, 0.00, 54000.00, 'usr_staff_01', NOW() - INTERVAL 10 MINUTE);
+INSERT IGNORE INTO `orders` (`id`, `order_number`,`status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
+('ord_sample_01', 'CSC-1001', 'completed', 'paid', 67000.00, 10000.00, 57000.00, 'usr_staff_01', NOW() - INTERVAL 2 HOUR),
+('ord_sample_02', 'CSC-1002', 'preparing', 'paid', 43000.00, 0.00, 43000.00, 'usr_staff_02', NOW() - INTERVAL 20 MINUTE),
+('ord_sample_03', 'CSC-1003', 'ready', 'paid', 34000.00, 0.00, 34000.00, 'usr_staff_01', NOW() - INTERVAL 10 MINUTE),
+('ord_sample_04', 'CSC-1004', 'pending', 'pending', 38000.00, 0.00, 38000.00, 'usr_staff_01', NOW() - INTERVAL 4 MINUTE);
 
 INSERT IGNORE INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
-('item_01_1', 'ord_sample_01', 'prod_crib_aren', 'Crib Aren Latte', 34000.00, 1, 34000.00, 'Large (16oz)', JSON_ARRAY('Extra Espresso Shot'), NOW() - INTERVAL 2 HOUR),
-('item_01_2', 'ord_sample_01', 'prod_croissant', 'Artisan Butter Croissant', 25000.00, 1, 28000.00, NULL, JSON_ARRAY('Salted Caramel Drizzle'), NOW() - INTERVAL 2 HOUR),
-('item_02_1', 'ord_sample_02', 'prod_butterscotch', 'Butterscotch Sea Salt Latte', 34000.00, 1, 34000.00, 'Regular (12oz)', NULL, NOW() - INTERVAL 20 MINUTE),
-('item_03_1', 'ord_sample_03', 'prod_matcha_latte', 'Matcha Oat Latte', 32000.00, 1, 32000.00, 'Hot (8oz)', NULL, NOW() - INTERVAL 10 MINUTE),
-('item_03_2', 'ord_sample_03', 'prod_fudge_brownie', 'Sea Salt Fudge Brownie', 22000.00, 1, 22000.00, NULL, NULL, NOW() - INTERVAL 10 MINUTE);
+('item_01_1', 'ord_sample_01', 'prod_crib_signature', 'Crib Signature Palm Latte', 35000.00, 1, 43000.00, 'Iced (16oz)', JSON_ARRAY('Sea Salt Cold Foam'), NOW() - INTERVAL 2 HOUR),
+('item_01_2', 'ord_sample_01', 'prod_french_croissant', 'French Butter Croissant', 24000.00, 1, 24000.00, 'Warmed Up', NULL, NOW() - INTERVAL 2 HOUR),
+('item_02_1', 'ord_sample_02', 'prod_uji_matcha_latte', 'Kyoto Uji Matcha Cloud', 36000.00, 1, 43000.00, 'Iced (16oz)', JSON_ARRAY('Sub Oat Milk'), NOW() - INTERVAL 20 MINUTE),
+('item_03_1', 'ord_sample_03', 'prod_tokyo_dark_americano', 'Tokyo Dark Iced Americano', 28000.00, 1, 34000.00, 'Iced (16oz)', JSON_ARRAY('Extra Espresso Shot'), NOW() - INTERVAL 10 MINUTE),
+('item_04_1', 'ord_sample_04', 'prod_v60_filter', 'V60 Single Origin Filter', 38000.00, 1, 38000.00, 'Hot Pour Over', NULL, NOW() - INTERVAL 4 MINUTE);
 
 INSERT IGNORE INTO `discounts` (`id`, `order_id`, `type`, `value`, `amount_applied`, `label`, `created_at`) VALUES
-('disc_01', 'ord_sample_01', 'fixed', 5000.00, 5000.00, 'Opening Promo Voucher', NOW() - INTERVAL 2 HOUR);
+('disc_01', 'ord_sample_01', 'fixed', 10000.00, 10000.00, 'Grand Opening Discount', NOW() - INTERVAL 2 HOUR);
 
 INSERT IGNORE INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
 ('pay_01', 'ord_sample_01', 'qris', 57000.00, 'paid', 'QRIS-GOPAY-992817231', NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 2 HOUR),
-('pay_02', 'ord_sample_02', 'cash', 34000.00, 'paid', 'CASH-REC-1002', NOW() - INTERVAL 20 MINUTE, NOW() - INTERVAL 20 MINUTE),
-('pay_03', 'ord_sample_03', 'card', 54000.00, 'paid', 'EDC-BCA-771829', NOW() - INTERVAL 10 MINUTE, NOW() - INTERVAL 10 MINUTE);
+('pay_02', 'ord_sample_02', 'cash', 43000.00, 'paid', 'CASH-REC-1002', NOW() - INTERVAL 20 MINUTE, NOW() - INTERVAL 20 MINUTE),
+('pay_03', 'ord_sample_03', 'card', 34000.00, 'paid', 'EDC-BCA-771829', NOW() - INTERVAL 10 MINUTE, NOW() - INTERVAL 10 MINUTE);
 
 INSERT IGNORE INTO `audit_logs` (`id`, `actor_user_id`, `action`, `entity_type`, `entity_id`, `metadata`) VALUES
 ('aud_01', 'usr_owner_01', 'SYSTEM_INIT', 'system', 'database', JSON_OBJECT('version', '0.2.0', 'status', 'initialized')),
-('aud_02', 'usr_owner_01', 'INVENTORY_RESTOCK', 'inventory', 'prod_crib_aren', JSON_OBJECT('qty_added', 45, 'reason', 'Initial stock inbound')),
-('aud_03', 'usr_staff_01', 'ORDER_COMPLETED', 'orders', 'ord_sample_01', JSON_OBJECT('order_number', '#CSC-1001', 'total', 57000.00, 'payment_method', 'qris'));
+('aud_02', 'usr_owner_01', 'INVENTORY_RESTOCK', 'inventory', 'prod_crib_signature', JSON_OBJECT('qty_added', 45, 'reason', 'Initial stock inbound')),
+('aud_03', 'usr_staff_01', 'ORDER_COMPLETED', 'orders', 'ord_sample_01', JSON_OBJECT('order_number', 'CSC-1001', 'total', 57000.00, 'payment_method', 'qris'));
 
 SET FOREIGN_KEY_CHECKS = 1;
