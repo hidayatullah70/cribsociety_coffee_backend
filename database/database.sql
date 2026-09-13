@@ -10,6 +10,22 @@ CREATE DATABASE IF NOT EXISTS `railway`
   CHARACTER SET utf8mb4 
   COLLATE utf8mb4_unicode_ci;
 USE `railway`;
+
+-- Drop existing tables to ensure a clean idempotent schema deployment
+DROP TABLE IF EXISTS `audit_logs`;
+DROP TABLE IF EXISTS `inventory_adjustments`;
+DROP TABLE IF EXISTS `inventory`;
+DROP TABLE IF EXISTS `discounts`;
+DROP TABLE IF EXISTS `payments`;
+DROP TABLE IF EXISTS `order_items`;
+DROP TABLE IF EXISTS `orders`;
+DROP TABLE IF EXISTS `product_addons`;
+DROP TABLE IF EXISTS `addons`;
+DROP TABLE IF EXISTS `product_variants`;
+DROP TABLE IF EXISTS `products`;
+DROP TABLE IF EXISTS `categories`;
+DROP TABLE IF EXISTS `users`;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ==============================================================================
@@ -20,7 +36,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Table: users
 -- Roles: owner, staff
 -- ------------------------------------------------------------------------------
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
     `id` VARCHAR(36) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
@@ -37,7 +53,7 @@ CREATE TABLE `users` (
 -- Table: categories
 -- Product menu classifications
 -- ------------------------------------------------------------------------------
-CREATE TABLE `categories` (
+CREATE TABLE IF NOT EXISTS `categories` (
     `id` VARCHAR(36) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `sort_order` INT NOT NULL DEFAULT 0,
@@ -53,7 +69,7 @@ CREATE TABLE `categories` (
 -- Table: products
 -- Catalog products with pricing and stock thresholds
 -- ------------------------------------------------------------------------------
-CREATE TABLE `products` (
+CREATE TABLE IF NOT EXISTS `products` (
     `id` VARCHAR(36) NOT NULL,
     `category_id` VARCHAR(36) NOT NULL,
     `name` VARCHAR(150) NOT NULL,
@@ -79,7 +95,7 @@ CREATE TABLE `products` (
 -- Table: product_variants
 -- Product size/type options with price modifiers
 -- ------------------------------------------------------------------------------
-CREATE TABLE `product_variants` (
+CREATE TABLE IF NOT EXISTS `product_variants` (
     `id` VARCHAR(36) NOT NULL,
     `product_id` VARCHAR(36) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
@@ -98,7 +114,7 @@ CREATE TABLE `product_variants` (
 -- Table: addons
 -- Extra toppings/modifiers for products
 -- ------------------------------------------------------------------------------
-CREATE TABLE `addons` (
+CREATE TABLE IF NOT EXISTS `addons` (
     `id` VARCHAR(36) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `price` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
@@ -114,7 +130,7 @@ CREATE TABLE `addons` (
 -- Table: product_addons
 -- Many-to-Many junction between products and permitted addons
 -- ------------------------------------------------------------------------------
-CREATE TABLE `product_addons` (
+CREATE TABLE IF NOT EXISTS `product_addons` (
     `product_id` VARCHAR(36) NOT NULL,
     `addon_id` VARCHAR(36) NOT NULL,
     PRIMARY KEY (`product_id`, `addon_id`),
@@ -133,7 +149,7 @@ CREATE TABLE `product_addons` (
 -- Table: orders
 -- Customer sales orders with lifecycle tracking
 -- ------------------------------------------------------------------------------
-CREATE TABLE `orders` (
+CREATE TABLE IF NOT EXISTS `orders` (
     `id` VARCHAR(36) NOT NULL,
     `order_number` VARCHAR(50) NOT NULL,
     `status` ENUM('pending', 'paid', 'preparing', 'ready', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
@@ -161,7 +177,7 @@ CREATE TABLE `orders` (
 -- Table: order_items
 -- Line items with immutable snapshot of names, prices, and addons
 -- ------------------------------------------------------------------------------
-CREATE TABLE `order_items` (
+CREATE TABLE IF NOT EXISTS `order_items` (
     `id` VARCHAR(36) NOT NULL,
     `order_id` VARCHAR(36) NOT NULL,
     `product_id` VARCHAR(36) NULL,
@@ -192,7 +208,7 @@ CREATE TABLE `order_items` (
 -- Table: payments
 -- Payment attempts and records
 -- ------------------------------------------------------------------------------
-CREATE TABLE `payments` (
+CREATE TABLE IF NOT EXISTS `payments` (
     `id` VARCHAR(36) NOT NULL,
     `order_id` VARCHAR(36) NOT NULL,
     `method` ENUM('cash', 'qris', 'card', 'other') NOT NULL,
@@ -215,7 +231,7 @@ CREATE TABLE `payments` (
 -- Table: discounts
 -- Applied discount history per order
 -- ------------------------------------------------------------------------------
-CREATE TABLE `discounts` (
+CREATE TABLE IF NOT EXISTS `discounts` (
     `id` VARCHAR(36) NOT NULL,
     `order_id` VARCHAR(36) NOT NULL,
     `type` ENUM('fixed', 'percentage') NOT NULL,
@@ -239,7 +255,7 @@ CREATE TABLE `discounts` (
 -- Table: inventory
 -- Current product-level stock
 -- ------------------------------------------------------------------------------
-CREATE TABLE `inventory` (
+CREATE TABLE IF NOT EXISTS `inventory` (
     `product_id` VARCHAR(36) NOT NULL,
     `quantity` INT NOT NULL DEFAULT 0,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -253,7 +269,7 @@ CREATE TABLE `inventory` (
 -- Table: inventory_adjustments
 -- Append-only historical log for all stock mutations
 -- ------------------------------------------------------------------------------
-CREATE TABLE `inventory_adjustments` (
+CREATE TABLE IF NOT EXISTS `inventory_adjustments` (
     `id` VARCHAR(36) NOT NULL,
     `product_id` VARCHAR(36) NOT NULL,
     `actor_user_id` VARCHAR(36) NOT NULL,
@@ -281,7 +297,7 @@ CREATE TABLE `inventory_adjustments` (
 -- Table: audit_logs
 -- Business-critical actions audit trail
 -- ------------------------------------------------------------------------------
-CREATE TABLE `audit_logs` (
+CREATE TABLE IF NOT EXISTS `audit_logs` (
     `id` VARCHAR(36) NOT NULL,
     `actor_user_id` VARCHAR(36) NULL,
     `action` VARCHAR(100) NOT NULL,
@@ -305,7 +321,7 @@ CREATE TABLE `audit_logs` (
 -- ------------------------------------------------------------------------------
 -- Users (Password: 'password123' bcrypt hash)
 -- ------------------------------------------------------------------------------
-INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `is_active`) VALUES
+INSERT IGNORE INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `is_active`) VALUES
 ('usr_owner_01', 'Admin Owner', 'owner@cribsociety.coffee', '$2b$10$J9DVVjXaH2TL0U8iMbvJLOi7ABoRTfXcWqZri.VvfoqTZZ92Ht68y', 'owner', TRUE),
 ('usr_staff_01', 'Barista Sarah', 'sarah@cribsociety.coffee', '$2b$10$J9DVVjXaH2TL0U8iMbvJLOi7ABoRTfXcWqZri.VvfoqTZZ92Ht68y', 'staff', TRUE),
 ('usr_staff_02', 'Cashier Dimas', 'dimas@cribsociety.coffee', '$2b$10$J9DVVjXaH2TL0U8iMbvJLOi7ABoRTfXcWqZri.VvfoqTZZ92Ht68y', 'staff', TRUE);
@@ -313,7 +329,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `is_active`
 -- ------------------------------------------------------------------------------
 -- Categories
 -- ------------------------------------------------------------------------------
-INSERT INTO `categories` (`id`, `name`, `sort_order`, `is_active`) VALUES
+INSERT IGNORE INTO `categories` (`id`, `name`, `sort_order`, `is_active`) VALUES
 ('cat_signature', 'Signature Coffee', 1, TRUE),
 ('cat_espresso',  'Espresso & Classic', 2, TRUE),
 ('cat_non_coffee','Non-Coffee & Refreshers', 3, TRUE),
@@ -322,7 +338,7 @@ INSERT INTO `categories` (`id`, `name`, `sort_order`, `is_active`) VALUES
 -- ------------------------------------------------------------------------------
 -- Products
 -- ------------------------------------------------------------------------------
-INSERT INTO `products` (`id`, `category_id`, `name`, `description`, `price`, `available`, `low_stock_threshold`, `is_archived`) VALUES
+INSERT IGNORE INTO `products` (`id`, `category_id`, `name`, `description`, `price`, `available`, `low_stock_threshold`, `is_archived`) VALUES
 -- Signature Coffee
 ('prod_crib_aren',      'cat_signature',  'Crib Aren Latte', 'Signature espresso, fresh milk, and organic aren palm sugar.', 28000.00, TRUE, 10, FALSE),
 ('prod_butterscotch',   'cat_signature',  'Butterscotch Sea Salt Latte', 'Double espresso, rich butterscotch caramel, and sea salt foam.', 34000.00, TRUE, 10, FALSE),
@@ -346,7 +362,7 @@ INSERT INTO `products` (`id`, `category_id`, `name`, `description`, `price`, `av
 -- ------------------------------------------------------------------------------
 -- Product Variants
 -- ------------------------------------------------------------------------------
-INSERT INTO `product_variants` (`id`, `product_id`, `name`, `price_delta`, `is_active`) VALUES
+INSERT IGNORE INTO `product_variants` (`id`, `product_id`, `name`, `price_delta`, `is_active`) VALUES
 -- Variants for Crib Aren Latte
 ('var_aren_reg',   'prod_crib_aren',    'Regular (12oz)', 0.00, TRUE),
 ('var_aren_large', 'prod_crib_aren',    'Large (16oz)', 6000.00, TRUE),
@@ -366,7 +382,7 @@ INSERT INTO `product_variants` (`id`, `product_id`, `name`, `price_delta`, `is_a
 -- ------------------------------------------------------------------------------
 -- Addons
 -- ------------------------------------------------------------------------------
-INSERT INTO `addons` (`id`, `name`, `price`, `is_active`) VALUES
+INSERT IGNORE INTO `addons` (`id`, `name`, `price`, `is_active`) VALUES
 ('add_extra_espresso', 'Extra Espresso Shot', 6000.00, TRUE),
 ('add_oat_milk',       'Swap to Oat Milk', 7000.00, TRUE),
 ('add_almond_milk',    'Swap to Almond Milk', 8000.00, TRUE),
@@ -377,7 +393,7 @@ INSERT INTO `addons` (`id`, `name`, `price`, `is_active`) VALUES
 -- ------------------------------------------------------------------------------
 -- Product Addons (Junction)
 -- ------------------------------------------------------------------------------
-INSERT INTO `product_addons` (`product_id`, `addon_id`) VALUES
+INSERT IGNORE INTO `product_addons` (`product_id`, `addon_id`) VALUES
 -- Crib Aren Latte addons
 ('prod_crib_aren', 'add_extra_espresso'),
 ('prod_crib_aren', 'add_oat_milk'),
@@ -407,7 +423,7 @@ INSERT INTO `product_addons` (`product_id`, `addon_id`) VALUES
 -- ------------------------------------------------------------------------------
 -- Inventory
 -- ------------------------------------------------------------------------------
-INSERT INTO `inventory` (`product_id`, `quantity`) VALUES
+INSERT IGNORE INTO `inventory` (`product_id`, `quantity`) VALUES
 ('prod_crib_aren',       45),
 ('prod_butterscotch',    30),
 ('prod_coco_cappuccino', 25),
@@ -424,7 +440,7 @@ INSERT INTO `inventory` (`product_id`, `quantity`) VALUES
 -- ------------------------------------------------------------------------------
 -- Inventory Adjustments (Initial Inbound)
 -- ------------------------------------------------------------------------------
-INSERT INTO `inventory_adjustments` (`id`, `product_id`, `actor_user_id`, `previous_quantity`, `adjustment_quantity`, `resulting_quantity`, `reason`) VALUES
+INSERT IGNORE INTO `inventory_adjustments` (`id`, `product_id`, `actor_user_id`, `previous_quantity`, `adjustment_quantity`, `resulting_quantity`, `reason`) VALUES
 ('adj_init_01', 'prod_crib_aren',     'usr_owner_01', 0, 45,  45,  'Initial stock inbound for opening'),
 ('adj_init_02', 'prod_butterscotch',  'usr_owner_01', 0, 30,  30,  'Initial stock inbound for opening'),
 ('adj_init_03', 'prod_croissant',     'usr_owner_01', 0, 12,  12,  'Morning fresh bakery delivery'),
@@ -434,44 +450,44 @@ INSERT INTO `inventory_adjustments` (`id`, `product_id`, `actor_user_id`, `previ
 -- Sample Orders
 -- ------------------------------------------------------------------------------
 -- Order 1: Completed QRIS Order
-INSERT INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
+INSERT IGNORE INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
 ('ord_sample_01', '#CSC-1001', 'completed', 'paid', 62000.00, 5000.00, 57000.00, 'usr_staff_01', NOW() - INTERVAL 2 HOUR);
 
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
+INSERT IGNORE INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
 ('item_01_1', 'ord_sample_01', 'prod_crib_aren', 'Crib Aren Latte', 34000.00, 1, 34000.00, 'Large (16oz)', JSON_ARRAY('Extra Espresso Shot'), NOW() - INTERVAL 2 HOUR),
 ('item_01_2', 'ord_sample_01', 'prod_croissant', 'Artisan Butter Croissant', 25000.00, 1, 28000.00, NULL, JSON_ARRAY('Salted Caramel Drizzle'), NOW() - INTERVAL 2 HOUR);
 
-INSERT INTO `discounts` (`id`, `order_id`, `type`, `value`, `amount_applied`, `label`, `created_at`) VALUES
+INSERT IGNORE INTO `discounts` (`id`, `order_id`, `type`, `value`, `amount_applied`, `label`, `created_at`) VALUES
 ('disc_01', 'ord_sample_01', 'fixed', 5000.00, 5000.00, 'Opening Promo Voucher', NOW() - INTERVAL 2 HOUR);
 
-INSERT INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
+INSERT IGNORE INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
 ('pay_01', 'ord_sample_01', 'qris', 57000.00, 'paid', 'QRIS-GOPAY-992817231', NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 2 HOUR);
 
 -- Order 2: Preparing Cash Order
-INSERT INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
+INSERT IGNORE INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
 ('ord_sample_02', '#CSC-1002', 'preparing', 'paid', 34000.00, 0.00, 34000.00, 'usr_staff_02', NOW() - INTERVAL 20 MINUTE);
 
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
+INSERT IGNORE INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
 ('item_02_1', 'ord_sample_02', 'prod_butterscotch', 'Butterscotch Sea Salt Latte', 34000.00, 1, 34000.00, 'Regular (12oz)', NULL, NOW() - INTERVAL 20 MINUTE);
 
-INSERT INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
+INSERT IGNORE INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
 ('pay_02', 'ord_sample_02', 'cash', 34000.00, 'paid', 'CASH-REC-1002', NOW() - INTERVAL 20 MINUTE, NOW() - INTERVAL 20 MINUTE);
 
 -- Order 3: Ready for pickup Card Order
-INSERT INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
+INSERT IGNORE INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
 ('ord_sample_03', '#CSC-1003', 'ready', 'paid', 54000.00, 0.00, 54000.00, 'usr_staff_01', NOW() - INTERVAL 10 MINUTE);
 
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
+INSERT IGNORE INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
 ('item_03_1', 'ord_sample_03', 'prod_matcha_latte', 'Matcha Oat Latte', 32000.00, 1, 32000.00, 'Hot (8oz)', NULL, NOW() - INTERVAL 10 MINUTE),
 ('item_03_2', 'ord_sample_03', 'prod_fudge_brownie', 'Sea Salt Fudge Brownie', 22000.00, 1, 22000.00, NULL, NULL, NOW() - INTERVAL 10 MINUTE);
 
-INSERT INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
+INSERT IGNORE INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
 ('pay_03', 'ord_sample_03', 'card', 54000.00, 'paid', 'EDC-BCA-771829', NOW() - INTERVAL 10 MINUTE, NOW() - INTERVAL 10 MINUTE);
 
 -- ------------------------------------------------------------------------------
 -- Sample Audit Logs
 -- ------------------------------------------------------------------------------
-INSERT INTO `audit_logs` (`id`, `actor_user_id`, `action`, `entity_type`, `entity_id`, `metadata`) VALUES
+INSERT IGNORE INTO `audit_logs` (`id`, `actor_user_id`, `action`, `entity_type`, `entity_id`, `metadata`) VALUES
 ('aud_01', 'usr_owner_01', 'SYSTEM_INIT', 'system', 'database', JSON_OBJECT('version', '0.2.0', 'status', 'initialized')),
 ('aud_02', 'usr_owner_01', 'INVENTORY_RESTOCK', 'inventory', 'prod_crib_aren', JSON_OBJECT('qty_added', 45, 'reason', 'Initial stock inbound')),
 ('aud_03', 'usr_staff_01', 'ORDER_COMPLETED', 'orders', 'ord_sample_01', JSON_OBJECT('order_number', '#CSC-1001', 'total', 57000.00, 'payment_method', 'qris'));
