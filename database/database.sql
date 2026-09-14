@@ -290,208 +290,264 @@ INSERT IGNORE INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `is_
 -- Categories Seed (Synchronized with Landing Page Menu)
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `categories` (`id`, `name`, `sort_order`, `is_active`) VALUES
-('cat_signature_coffee', 'Signature Coffee', 1, TRUE),
-('cat_coffee',           'Coffee',           2, TRUE),
-('cat_non_coffee',       'Non Coffee',       3, TRUE),
-('cat_food',             'Food',             4, TRUE),
-('cat_matcha_yakult',    'Matcha & Yakult',  5, TRUE),
-('cat_snack',            'Snack',            6, TRUE),
-('cat_addon',            'Add On',           7, TRUE);
+('cat_signature',    'SIGNATURE',        1, TRUE),
+('cat_coffee',       'COFFEE',           2, TRUE),
+('cat_non_coffee',   'NON COFFEE',       3, TRUE),
+('cat_food',         'FOOD',             4, TRUE),
+('cat_matcha_yakult','MATCHA & YAKULT',  5, TRUE),
+('cat_snack',        'SNACK',            6, TRUE),
+('cat_addon',        'ADD ON',           7, TRUE);
 
 -- ------------------------------------------------------------------------------
--- Products Seed
+-- Products Seed (37 items)
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `products` (`id`, `category_id`, `name`, `description`, `price`, `image_url`, `available`, `low_stock_threshold`, `is_archived`) VALUES
--- 1. Signature Coffee
-('prod_crib_signature',        'cat_signature_coffee', 'Crib Signature Palm Latte', 'Double shot slow-extracted espresso, creamy oat blend, infused with organic palm nectar & sea salt froth.', 35000.00, 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_matcha_espresso_dirty', 'cat_signature_coffee', 'Matcha Espresso Dirty', 'Ceremonial grade Uji matcha bottom layer topped with chilled fresh milk and a floating hot espresso shot.', 38000.00, 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&q=80&w=600', TRUE, 8, FALSE),
-('prod_tokyo_dark_americano',  'cat_signature_coffee', 'Tokyo Dark Iced Americano', 'Crisp, citrusy washed Ethiopian beans pulled over crystal rock ice with subtle orange twist aroma.', 28000.00, 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&q=80&w=600', TRUE, 15, FALSE),
-('prod_spanish_cinnamon_latte','cat_signature_coffee', 'Spanish Cinnamon Latte', 'Sweet condensed milk foundation layered with bold dark roast and freshly ground Ceylon cinnamon.', 34000.00, 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+-- 1. SIGNATURE
+('prod_crib_aren_latte',        'cat_signature', 'CRIB AREN LATTE', 'Espresso double shot dipadukan dengan susu segar creamy dan gula aren organik khas Crib Society.', 28000.00, '/menu/signatureCoffee/cribSignaturePalm.png', TRUE, 10, FALSE),
+('prod_crib_butterscotch_latte','cat_signature', 'CRIB BUTTERSCOTCH LATTE', 'Espresso racikan khas dengan saus butterscotch manis gurih dan tekstur susu velvety lembut.', 32000.00, '/menu/signatureCoffee/cribSignaturePalm.png', TRUE, 10, FALSE),
+('prod_crib_chocolate_creamy',  'cat_signature', 'CRIB CHOCOLATE CREAMY', 'Dark chocolate premium dengan susu kental creamy dan sentuhan cacao dusting di atasnya.', 30000.00, '/menu/signatureCoffee/cribSignaturePalm.png', TRUE, 10, FALSE),
+('prod_crib_red_spark',         'cat_signature', 'CRIB RED SPARK', 'Kombinasi sparkling segar dengan sirup red berry dan espresso cold brew beraroma buah.', 30000.00, '/menu/signatureCoffee/cribSignaturePalm.png', TRUE, 8, FALSE),
+('prod_crib_matcha_strawberry', 'cat_signature', 'CRIB MATCHA STRAWBERRY', 'Layer bertingkat dari pure strawberry compote, susu segar, dan ceremonial Uji matcha.', 34000.00, '/menu/signatureCoffee/cribSignaturePalm.png', TRUE, 8, FALSE),
 
--- 2. Coffee
-('prod_velvet_flat_white',     'cat_coffee',           'Velvet Flat White', 'Double ristretto with micro-foamed whole milk creating a glossy velvet texture and balanced body.', 32000.00, 'https://images.unsplash.com/photo-1577968897966-3d4325b36b61?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_classic_cappuccino',    'cat_coffee',           'Classic Italian Cappuccino', 'Equal parts rich espresso, steamed milk, and thick velvety microfoam dusted with raw cacao powder.', 30000.00, 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_v60_filter',            'cat_coffee',           'V60 Single Origin Filter', 'Hand-poured floral Ethiopian Yirgacheffe with notes of bergamot, peach sweetness, and jasmine.', 38000.00, 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
-('prod_vanilla_cold_brew',     'cat_coffee',           'Vanilla Sweet Cold Brew', '18-hour cold-steeped Arabica coffee topped with a splash of sweet vanilla-infused cream.', 33000.00, 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+-- 2. COFFEE
+('prod_cappucino',      'cat_coffee', 'CAPPUCINO', 'Perpaduan seimbang espresso kaya rasa, steamed milk, dan microfoam tebal dengan taburan cokelat.', 28000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
+('prod_latte',          'cat_coffee', 'LATTE', 'Espresso murni dengan steamed milk lembut dan lapisan foam tipis bertekstur sutra.', 28000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
+('prod_americano',      'cat_coffee', 'AMERICANO', 'Double espresso dilarutkan dengan air mineral dingin/panas, menghasilkan profil kopi bersih dan segar.', 22000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 15, FALSE),
+('prod_strawberry_cano','cat_coffee', 'STRAWBERRY CANO', 'Americano segar berpadu dengan sirup strawberry manis asam yang menyegarkan dahaga.', 26000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
+('prod_peach_cano',     'cat_coffee', 'PEACH CANO', 'Americano dingin dengan ekstrak buah peach aromatik dan aftertaste buah yang manis elegan.', 26000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
+('prod_pineapple_cano', 'cat_coffee', 'PINEAPPLE CANO', 'Sensasi segar espresso berpadu dengan rasa tropis nanas segar yang renyah di lidah.', 26000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
+('prod_vanilla_latte',  'cat_coffee', 'VANILLA LATTE', 'Caffè latte klasik yang diperkaya dengan sirup vanila aromatik manis lembut.', 30000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
+('prod_caramel_latte',  'cat_coffee', 'CARAMEL LATTE', 'Espresso dan susu segar berpadu saus karamel lezat dengan rasa manis gurih khas.', 30000.00, '/menu/coffee/matchaExpressoDirty.png', TRUE, 10, FALSE),
 
--- 3. Non Coffee
-('prod_artisan_dark_chocolate','cat_non_coffee',       'Artisan Dark Chocolate', '70% Single-origin Indonesian cocoa blended with steamed fresh milk and organic brown sugar.', 32000.00, 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&q=80&w=600', TRUE, 8, FALSE),
-('prod_earl_grey_milk_tea',    'cat_non_coffee',       'Royal Earl Grey Milk Tea', 'Fragrant citrusy bergamot black tea steeped rich, shaken with creamy fresh milk and wildflower honey.', 28000.00, 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_sparkling_berry_hibiscus','cat_non_coffee',     'Sparkling Berry Hibiscus', 'Refreshing cold-brewed crimson hibiscus tea paired with muddled berries, mint, and sparkling soda.', 30000.00, 'https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+-- 3. NON COFFEE
+('prod_cookies_cream', 'cat_non_coffee', 'COOKIES & CREAM', 'Minuman creamy vanila dengan remukan biskuit cokelat renyah dan topping melimpah.', 30000.00, '/menu/nonCoffee/nonCoffeepng.png', TRUE, 10, FALSE),
+('prod_red_velvet',    'cat_non_coffee', 'RED VELVET', 'Paduan rasa red velvet kaya rasa dengan susu segar creamy dan rasa cokelat lembut.', 28000.00, '/menu/nonCoffee/nonCoffeepng.png', TRUE, 10, FALSE),
+('prod_taro',          'cat_non_coffee', 'TARO', 'Rasa taro manis legit beraroma khas berpadu sempurna dengan susu segar.', 28000.00, '/menu/nonCoffee/nonCoffeepng.png', TRUE, 10, FALSE),
+('prod_lemon_tea',     'cat_non_coffee', 'LEMON TEA', 'Seduhan teh hitam pilihan dengan perasan lemon segar alami yang asam manis menyegarkan.', 22000.00, '/menu/nonCoffee/nonCoffeepng.png', TRUE, 10, FALSE),
+('prod_lychee_tea',    'cat_non_coffee', 'LYCHEE TEA', 'Teh harum wangi dengan sirup leci manis segar dan buah leci utuh di dalamnya.', 25000.00, '/menu/nonCoffee/nonCoffeepng.png', TRUE, 10, FALSE),
+('prod_mineral_water', 'cat_non_coffee', 'MINERAL WATER', 'Air mineral kemasan botol segar dan dingin untuk menjaga hidrasi tubuh.', 10000.00, '/menu/nonCoffee/nonCoffeepng.png', TRUE, 20, FALSE),
 
--- 4. Food
-('prod_truffle_beef_bowl',     'cat_food',             'Truffle Beef Gyudon Bowl', 'Tender sliced Australian beef sautéed in aromatic truffle soy sauce over Japanese rice with onsen egg.', 48000.00, 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
-('prod_creamy_carbonara',      'cat_food',             'Smoked Beef Carbonara', 'Al dente spaghetti tossed in rich parmesan egg yolk sauce, crispy smoked beef bacon, and black pepper.', 45000.00, 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
-('prod_crispy_chicken_matah',  'cat_food',             'Crispy Chicken Sambal Matah', 'Crispy golden chicken karaage bites served on warm steamed rice with spicy fragrant Balinese sambal matah.', 42000.00, 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&q=80&w=600', TRUE, 6, FALSE),
+-- 4. FOOD
+('prod_crib_chiken_salted_egg', 'cat_food', 'CRIB CHIKEN SALTED EGG', 'Ayam krispi renyah dibalut saus telur asin gurih harum daun kari di atas nasi hangat.', 38000.00, '/menu/food/cribComfortFriedRice.png', TRUE, 8, FALSE),
+('prod_crib_nanban_rice_garlic','cat_food', 'CRIB NANBAN RICE GARLIC', 'Ayam nanban juicy dengan siraman saus tartar gurih di atas nasi aroma bawang putih spesial.', 38000.00, '/menu/food/cribComfortFriedRice.png', TRUE, 8, FALSE),
+('prod_crib_fried_rice',        'cat_food', 'CRIB FRIED RICE', 'Nasi goreng racikan bumbu khas Crib Society dengan potongan ayam, telur, dan kerupuk renyah.', 32000.00, '/menu/food/cribComfortFriedRice.png', TRUE, 10, FALSE),
+('prod_crib_comfort_fried_rice','cat_food', 'CRIB COMFORT FRIED RICE', 'Nasi goreng rempah istimewa berpadu sosis, telur mata sapi, dan acar segar pelengkap.', 35000.00, '/menu/food/cribComfortFriedRice.png', TRUE, 10, FALSE),
 
--- 5. Matcha & Yakult
-('prod_uji_matcha_latte',      'cat_matcha_yakult',    'Kyoto Uji Matcha Cloud', 'Ceremonial grade Kyoto Uji matcha whisked fresh with velvety milk and delicate foam layer.', 36000.00, 'https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_strawberry_matcha_latte','cat_matcha_yakult',   'Strawberry Matcha Fusion', 'Sweet chunky strawberry compote layered with cold whole milk and topped with rich emerald Uji matcha.', 38000.00, 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&q=80&w=600', TRUE, 8, FALSE),
-('prod_lychee_yakult_breeze',  'cat_matcha_yakult',    'Lychee Yakult Breeze', 'Whole juicy lychee fruit muddled with probiotic Yakult and chilled sparkling soda over ice.', 29000.00, 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_mango_yakult_cooler',   'cat_matcha_yakult',    'Mango Yakult Cooler', 'Ripe tropical mango nectar blended with creamy probiotic Yakult and crushed mint ice.', 29000.00, 'https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
+-- 5. MATCHA & YAKULT
+('prod_matcha_latte',     'cat_matcha_yakult', 'MATCHA LATTE', 'Bubuk matcha murni berkualitas Jepang diseduh dengan susu hangat/dingin creamy berbusa halus.', 30000.00, '/menu/matchaYakult/matchaSeries.png', TRUE, 10, FALSE),
+('prod_matcha_vanilla',   'cat_matcha_yakult', 'MATCHA VANILLA', 'Matcha latte gurih dipadukan dengan aroma vanila manis untuk rasa yang lebih lembut.', 32000.00, '/menu/matchaYakult/matchaSeries.png', TRUE, 10, FALSE),
+('prod_peach_yakult',     'cat_matcha_yakult', 'PEACH YAKULT', 'Kombinasi asam manis Yakult segar dengan rasa buah peach manis yang harum dan dingin.', 26000.00, '/menu/matchaYakult/yakultSeries.png', TRUE, 10, FALSE),
+('prod_pineapple_yakult', 'cat_matcha_yakult', 'PINEAPPLE YAKULT', 'Paduan probiotik Yakult dengan sari nanas segar, sangat cocok diminum di cuaca terik.', 26000.00, '/menu/matchaYakult/yakultSeries.png', TRUE, 10, FALSE),
+('prod_strawberry_yakult','cat_matcha_yakult', 'STRAWBERRY YAKULT', 'Minuman probiotik Yakult berpadu sirup strawberry merah manis asam yang menggugah selera.', 26000.00, '/menu/matchaYakult/yakultSeries.png', TRUE, 10, FALSE),
 
--- 6. Snack
-('prod_truffle_fries',         'cat_snack',            'Truffle Parmesan Fries', 'Crispy shoestring golden fries tossed in white truffle oil, Himalayan pink salt, and grated parmesan.', 26000.00, 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&q=80&w=600', TRUE, 10, FALSE),
-('prod_french_croissant',      'cat_snack',            'French Butter Croissant', '36-layer fermented French AOP butter pastry, baked golden flaky crisp every morning.', 24000.00, 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=600', TRUE, 5, FALSE),
-('prod_crispy_chicken_tenders','cat_snack',            'Crispy Chicken Tenders', 'Juicy buttermilk marinated chicken tenders fried golden crisp, served with house dipping sauce.', 32000.00, 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&q=80&w=600', TRUE, 6, FALSE),
-('prod_pain_au_chocolat',      'cat_snack',            'Valrhona Pain au Chocolat', 'Golden laminated dough with two batons of 64% Valrhona French dark chocolate.', 28000.00, 'https://images.unsplash.com/photo-1530610476181-d83430b64dcd?auto=format&fit=crop&q=80&w=600', TRUE, 6, FALSE),
+-- 6. SNACKS
+('prod_crib_bites_platter',      'cat_snack', 'CRIB BITES PLATTER', 'Platter kombinasi kentang goreng, sosis krispi, dan cireng renyah dengan saus cocolan nikmat.', 35000.00, '/menu/snack/frenchFries.png', TRUE, 10, FALSE),
+('prod_french_fries',            'cat_snack', 'FRENCH FRIES', 'Kentang goreng renyah keemasan bertabur garam gurih dan rempah pilihan.', 22000.00, '/menu/snack/frenchFries.png', TRUE, 15, FALSE),
+('prod_choco_cheese_toasty',     'cat_snack', 'CHOCO CHEESE TOASTY', 'Roti panggang mentega dengan isian cokelat lumer tebal dan parutan keju gurih melimpah.', 25000.00, '/menu/snack/crispyBananaChoChees.png', TRUE, 10, FALSE),
+('prod_crispy_banana_cho_chees', 'cat_snack', 'CRISPY BANANA CHO & CHEES', 'Pisang goreng renyah krispi dengan limpahan cokelat leleh dan keju cheddar parut.', 25000.00, '/menu/snack/crispyBananaChoChees.png', TRUE, 10, FALSE),
+('prod_cireng_rujak',            'cat_snack', 'CIRENG RUJAK', 'Cireng kenyal gurih digoreng garing disajikan dengan cocolan bumbu rujak pedas manis.', 20000.00, '/menu/snack/frenchFries.png', TRUE, 10, FALSE),
+('prod_dimsum',                  'cat_snack', 'DIMSUM', 'Dimsum ayam kukus lembut juicy disajikan dengan saus chili oil pedas gurih.', 24000.00, '/menu/snack/frenchFries.png', TRUE, 10, FALSE),
 
--- 7. Add On
-('prod_addon_espresso_shot',   'cat_addon',            'Extra Espresso Shot', 'Additional fresh double shot extracted from our signature house blend coffee beans.', 6000.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600', TRUE, 20, FALSE),
-('prod_addon_oat_milk',        'cat_addon',            'Oat Milk Barista Upgrade', 'Swap regular dairy milk with silky, creamy Oatly Barista Edition oat milk.', 7000.00, 'https://images.unsplash.com/photo-1588710929895-6ef7d87a93a6?auto=format&fit=crop&q=80&w=600', TRUE, 15, FALSE),
-('prod_addon_sea_salt_foam',   'cat_addon',            'Sea Salt Cold Foam', 'Thick velvety whipped cold foam sprinkled with fine Himalayan pink sea salt.', 8000.00, 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', TRUE, 15, FALSE),
-('prod_addon_flavor_syrup',    'cat_addon',            'Artisan Flavored Syrup', 'Extra pumps of Madagascar Vanilla, Salted Caramel, or Hazelnut artisanal syrup.', 5000.00, 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600', TRUE, 20, FALSE);
+-- 7. ADD ON
+('prod_extra_shoot', 'cat_addon', 'EXTRA SHOOT', 'Tambahan satu shot espresso murni ekstra mantap untuk minuman kopi Anda.', 6000.00, '/menu/addOn/friedEgg.png', TRUE, 20, FALSE),
+('prod_fried_egg',   'cat_addon', 'FRIED EGG', 'Telur mata sapi goreng setengah matang atau matang sempurna pelengkap hidangan makanan.', 6000.00, '/menu/addOn/friedEgg.png', TRUE, 15, FALSE),
+('prod_extra_syrup', 'cat_addon', 'EXTRA SYRUP', 'Tambahan pilihan sirup Vanilla, Caramel, Palm, atau Hazelnut.', 5000.00, '/menu/addOn/friedEgg.png', TRUE, 15, FALSE);
 
 -- ------------------------------------------------------------------------------
 -- Product Variants Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `product_variants` (`id`, `product_id`, `name`, `price_delta`, `is_active`) VALUES
-('var_crib_iced',       'prod_crib_signature',         'Iced (16oz)', 0.00, TRUE),
-('var_crib_hot',        'prod_crib_signature',         'Hot (12oz)', 0.00, TRUE),
-('var_crib_large',      'prod_crib_signature',         'Iced Large (22oz)', 6000.00, TRUE),
-('var_dirty_std',       'prod_matcha_espresso_dirty',  'Iced Dirty (Standard)', 0.00, TRUE),
-('var_tokyo_iced',      'prod_tokyo_dark_americano',   'Iced (16oz)', 0.00, TRUE),
-('var_tokyo_hot',       'prod_tokyo_dark_americano',   'Hot (10oz)', 0.00, TRUE),
-('var_spanish_iced',    'prod_spanish_cinnamon_latte', 'Iced (16oz)', 0.00, TRUE),
-('var_spanish_hot',     'prod_spanish_cinnamon_latte', 'Hot (12oz)', 0.00, TRUE),
-('var_flat_white_std',  'prod_velvet_flat_white',      'Hot (8oz Standard)', 0.00, TRUE),
-('var_capp_hot',        'prod_classic_cappuccino',     'Hot (8oz)', 0.00, TRUE),
-('var_capp_iced',       'prod_classic_cappuccino',     'Iced (16oz)', 0.00, TRUE),
-('var_v60_hot',         'prod_v60_filter',             'Hot Pour Over', 0.00, TRUE),
-('var_v60_iced',        'prod_v60_filter',             'Japanese Flash Iced', 3000.00, TRUE),
-('var_coldbrew_iced',   'prod_vanilla_cold_brew',      'Iced (16oz)', 0.00, TRUE),
-('var_choco_iced',      'prod_artisan_dark_chocolate', 'Iced (16oz)', 0.00, TRUE),
-('var_choco_hot',       'prod_artisan_dark_chocolate', 'Hot (12oz)', 0.00, TRUE),
-('var_earl_iced',       'prod_earl_grey_milk_tea',     'Iced (16oz)', 0.00, TRUE),
-('var_earl_hot',        'prod_earl_grey_milk_tea',     'Hot (12oz)', 0.00, TRUE),
-('var_hibiscus_iced',   'prod_sparkling_berry_hibiscus','Iced (16oz)', 0.00, TRUE),
-('var_gyudon_reg',      'prod_truffle_beef_bowl',      'Regular Portion', 0.00, TRUE),
-('var_gyudon_large',    'prod_truffle_beef_bowl',      'Large Beef (+50g)', 12000.00, TRUE),
-('var_carbonara_std',   'prod_creamy_carbonara',       'Standard Portion', 0.00, TRUE),
-('var_chicken_med',     'prod_crispy_chicken_matah',   'Medium Spicy', 0.00, TRUE),
-('var_chicken_extra',   'prod_crispy_chicken_matah',   'Extra Spicy', 0.00, TRUE),
-('var_matcha_iced',     'prod_uji_matcha_latte',       'Iced (16oz)', 0.00, TRUE),
-('var_matcha_hot',      'prod_uji_matcha_latte',       'Hot (12oz)', 0.00, TRUE),
-('var_straw_matcha',    'prod_strawberry_matcha_latte','Iced (16oz)', 0.00, TRUE),
-('var_lychee_breeze',   'prod_lychee_yakult_breeze',   'Iced (16oz)', 0.00, TRUE),
-('var_mango_cooler',    'prod_mango_yakult_cooler',    'Iced (16oz)', 0.00, TRUE),
-('var_fries_std',       'prod_truffle_fries',          'Standard Basket', 0.00, TRUE),
-('var_croissant_warm',  'prod_french_croissant',       'Warmed Up', 0.00, TRUE),
-('var_croissant_room',  'prod_french_croissant',       'Room Temperature', 0.00, TRUE),
-('var_tenders_basket',  'prod_crispy_chicken_tenders', '6 pcs Basket', 0.00, TRUE),
-('var_pain_warm',       'prod_pain_au_chocolat',       'Warmed Up', 0.00, TRUE),
-('var_pain_room',       'prod_pain_au_chocolat',       'Room Temperature', 0.00, TRUE);
+('var_aren_iced',       'prod_crib_aren_latte',         'Iced', 0.00, TRUE),
+('var_aren_hot',        'prod_crib_aren_latte',         'Hot',  0.00, TRUE),
+('var_butter_iced',     'prod_crib_butterscotch_latte', 'Iced', 0.00, TRUE),
+('var_butter_hot',      'prod_crib_butterscotch_latte', 'Hot',  0.00, TRUE),
+('var_choco_iced',      'prod_crib_chocolate_creamy',   'Iced', 0.00, TRUE),
+('var_choco_hot',       'prod_crib_chocolate_creamy',   'Hot',  0.00, TRUE),
+('var_red_iced',        'prod_crib_red_spark',          'Iced', 0.00, TRUE),
+('var_mstr_iced',       'prod_crib_matcha_strawberry',  'Iced', 0.00, TRUE),
+
+('var_cap_hot',         'prod_cappucino',       'Hot',  0.00, TRUE),
+('var_cap_iced',        'prod_cappucino',       'Iced', 0.00, TRUE),
+('var_latte_hot',       'prod_latte',           'Hot',  0.00, TRUE),
+('var_latte_iced',      'prod_latte',           'Iced', 0.00, TRUE),
+('var_ame_iced',        'prod_americano',       'Iced', 0.00, TRUE),
+('var_ame_hot',         'prod_americano',       'Hot',  0.00, TRUE),
+('var_str_cano',        'prod_strawberry_cano', 'Iced', 0.00, TRUE),
+('var_pch_cano',        'prod_peach_cano',      'Iced', 0.00, TRUE),
+('var_pin_cano',        'prod_pineapple_cano',  'Iced', 0.00, TRUE),
+('var_van_iced',        'prod_vanilla_latte',   'Iced', 0.00, TRUE),
+('var_van_hot',         'prod_vanilla_latte',   'Hot',  0.00, TRUE),
+('var_car_iced',        'prod_caramel_latte',   'Iced', 0.00, TRUE),
+('var_car_hot',         'prod_caramel_latte',   'Hot',  0.00, TRUE),
+
+('var_ck_iced',         'prod_cookies_cream',   'Iced', 0.00, TRUE),
+('var_ck_hot',          'prod_cookies_cream',   'Hot',  0.00, TRUE),
+('var_rv_iced',         'prod_red_velvet',      'Iced', 0.00, TRUE),
+('var_rv_hot',          'prod_red_velvet',      'Hot',  0.00, TRUE),
+('var_taro_iced',       'prod_taro',            'Iced', 0.00, TRUE),
+('var_taro_hot',        'prod_taro',            'Hot',  0.00, TRUE),
+('var_lt_iced',         'prod_lemon_tea',       'Iced', 0.00, TRUE),
+('var_lt_hot',          'prod_lemon_tea',       'Hot',  0.00, TRUE),
+('var_ly_iced',         'prod_lychee_tea',      'Iced', 0.00, TRUE),
+('var_mw_cold',         'prod_mineral_water',   'Cold', 0.00, TRUE),
+('var_mw_norm',         'prod_mineral_water',   'Normal',0.00, TRUE),
+
+('var_food_c1',         'prod_crib_chiken_salted_egg',  'Regular Portion', 0.00, TRUE),
+('var_food_c2',         'prod_crib_nanban_rice_garlic', 'Regular Portion', 0.00, TRUE),
+('var_food_c3',         'prod_crib_fried_rice',         'Regular Portion', 0.00, TRUE),
+('var_food_c4',         'prod_crib_comfort_fried_rice', 'Regular Portion', 0.00, TRUE),
+
+('var_ml_iced',         'prod_matcha_latte',      'Iced', 0.00, TRUE),
+('var_ml_hot',          'prod_matcha_latte',      'Hot',  0.00, TRUE),
+('var_mv_iced',         'prod_matcha_vanilla',    'Iced', 0.00, TRUE),
+('var_mv_hot',          'prod_matcha_vanilla',    'Hot',  0.00, TRUE),
+('var_py_iced',         'prod_peach_yakult',      'Iced', 0.00, TRUE),
+('var_piny_iced',       'prod_pineapple_yakult',  'Iced', 0.00, TRUE),
+('var_sy_iced',         'prod_strawberry_yakult', 'Iced', 0.00, TRUE),
+
+('var_snk_plt',         'prod_crib_bites_platter',      'Sharing Size', 0.00, TRUE),
+('var_snk_ff',          'prod_french_fries',            'Standard',     0.00, TRUE),
+('var_snk_tst',         'prod_choco_cheese_toasty',     'Standard',     0.00, TRUE),
+('var_snk_bna',         'prod_crispy_banana_cho_chees', 'Standard',     0.00, TRUE),
+('var_snk_crg',         'prod_cireng_rujak',            'Standard',     0.00, TRUE),
+('var_snk_dms',         'prod_dimsum',                  '4 Pcs',        0.00, TRUE),
+
+('var_add_shot',        'prod_extra_shoot', '1 Shot',          0.00, TRUE),
+('var_add_egg1',        'prod_fried_egg',   'Sunny Side Up',   0.00, TRUE),
+('var_add_egg2',        'prod_fried_egg',   'Well Done',       0.00, TRUE),
+('var_add_syr1',        'prod_extra_syrup', 'Vanilla Syrup',   0.00, TRUE),
+('var_add_syr2',        'prod_extra_syrup', 'Caramel Syrup',   0.00, TRUE),
+('var_add_syr3',        'prod_extra_syrup', 'Palm Sugar',      0.00, TRUE);
 
 -- ------------------------------------------------------------------------------
 -- Addons Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `addons` (`id`, `name`, `price`, `is_active`) VALUES
-('add_extra_shot',      'Extra Espresso Shot',    6000.00, TRUE),
-('add_oat_milk',        'Sub Oat Milk',           7000.00, TRUE),
-('add_sea_salt_foam',   'Sea Salt Cold Foam',     8000.00, TRUE),
-('add_extra_matcha',    'Extra Uji Matcha Layer', 8000.00, TRUE),
-('add_tonic_splash',    'Tonic Water Splash',     5000.00, TRUE),
-('add_whipped_cream',   'Whipped Cream',          5000.00, TRUE),
-('add_strawberry_jam',  'House Strawberry Jam',   4000.00, TRUE),
-('add_butter_pad',      'Extra Salted Butter',    4000.00, TRUE),
-('add_extra_egg',       'Extra Onsen Egg',        6000.00, TRUE),
-('add_extra_cheese',    'Extra Parmesan Cheese',  5000.00, TRUE),
-('add_extra_matah',     'Extra Sambal Matah',     4000.00, TRUE);
+('add_extra_shoot', 'Extra Shoot', 6000.00, TRUE),
+('add_fried_egg',   'Fried Egg',   6000.00, TRUE),
+('add_extra_syrup', 'Extra Syrup', 5000.00, TRUE);
 
 -- ------------------------------------------------------------------------------
 -- Product Addons Seed (Junction)
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `product_addons` (`product_id`, `addon_id`) VALUES
-('prod_crib_signature',        'add_extra_shot'),
-('prod_crib_signature',        'add_oat_milk'),
-('prod_crib_signature',        'add_sea_salt_foam'),
-('prod_matcha_espresso_dirty', 'add_extra_shot'),
-('prod_matcha_espresso_dirty', 'add_extra_matcha'),
-('prod_tokyo_dark_americano',  'add_extra_shot'),
-('prod_tokyo_dark_americano',  'add_tonic_splash'),
-('prod_spanish_cinnamon_latte','add_extra_shot'),
-('prod_spanish_cinnamon_latte','add_whipped_cream'),
-('prod_velvet_flat_white',     'add_oat_milk'),
-('prod_velvet_flat_white',     'add_extra_shot'),
-('prod_classic_cappuccino',    'add_extra_shot'),
-('prod_artisan_dark_chocolate','add_oat_milk'),
-('prod_artisan_dark_chocolate','add_sea_salt_foam'),
-('prod_truffle_beef_bowl',     'add_extra_egg'),
-('prod_creamy_carbonara',      'add_extra_cheese'),
-('prod_crispy_chicken_matah',  'add_extra_matah'),
-('prod_uji_matcha_latte',      'add_oat_milk'),
-('prod_uji_matcha_latte',      'add_sea_salt_foam'),
-('prod_strawberry_matcha_latte','add_oat_milk'),
-('prod_french_croissant',      'add_strawberry_jam'),
-('prod_french_croissant',      'add_butter_pad');
+('prod_crib_aren_latte', 'add_extra_shoot'),
+('prod_crib_aren_latte', 'add_extra_syrup'),
+('prod_crib_butterscotch_latte', 'add_extra_shoot'),
+('prod_crib_butterscotch_latte', 'add_extra_syrup'),
+('prod_crib_chocolate_creamy', 'add_extra_shoot'),
+('prod_crib_chocolate_creamy', 'add_extra_syrup'),
+('prod_crib_red_spark', 'add_extra_shoot'),
+('prod_crib_red_spark', 'add_extra_syrup'),
+('prod_crib_matcha_strawberry', 'add_extra_shoot'),
+('prod_crib_matcha_strawberry', 'add_extra_syrup'),
+
+('prod_cappucino', 'add_extra_shoot'),
+('prod_cappucino', 'add_extra_syrup'),
+('prod_latte', 'add_extra_shoot'),
+('prod_latte', 'add_extra_syrup'),
+('prod_americano', 'add_extra_shoot'),
+('prod_americano', 'add_extra_syrup'),
+('prod_strawberry_cano', 'add_extra_shoot'),
+('prod_strawberry_cano', 'add_extra_syrup'),
+('prod_peach_cano', 'add_extra_shoot'),
+('prod_peach_cano', 'add_extra_syrup'),
+('prod_pineapple_cano', 'add_extra_shoot'),
+('prod_pineapple_cano', 'add_extra_syrup'),
+('prod_vanilla_latte', 'add_extra_shoot'),
+('prod_vanilla_latte', 'add_extra_syrup'),
+('prod_caramel_latte', 'add_extra_shoot'),
+('prod_caramel_latte', 'add_extra_syrup'),
+
+('prod_cookies_cream', 'add_extra_syrup'),
+('prod_red_velvet', 'add_extra_syrup'),
+('prod_taro', 'add_extra_syrup'),
+('prod_lemon_tea', 'add_extra_syrup'),
+('prod_lychee_tea', 'add_extra_syrup'),
+
+('prod_crib_chiken_salted_egg', 'add_fried_egg'),
+('prod_crib_nanban_rice_garlic', 'add_fried_egg'),
+('prod_crib_fried_rice', 'add_fried_egg'),
+('prod_crib_comfort_fried_rice', 'add_fried_egg'),
+
+('prod_matcha_latte', 'add_extra_shoot'),
+('prod_matcha_latte', 'add_extra_syrup'),
+('prod_matcha_vanilla', 'add_extra_shoot'),
+('prod_matcha_vanilla', 'add_extra_syrup'),
+('prod_peach_yakult', 'add_extra_syrup'),
+('prod_pineapple_yakult', 'add_extra_syrup'),
+('prod_strawberry_yakult', 'add_extra_syrup');
 
 -- ------------------------------------------------------------------------------
 -- Inventory Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `inventory` (`product_id`, `quantity`) VALUES
-('prod_crib_signature',        45),
-('prod_matcha_espresso_dirty', 25),
-('prod_tokyo_dark_americano',  80),
-('prod_spanish_cinnamon_latte',28),
-('prod_velvet_flat_white',     50),
-('prod_classic_cappuccino',    40),
-('prod_v60_filter',            22),
-('prod_vanilla_cold_brew',     35),
-('prod_artisan_dark_chocolate',30),
-('prod_earl_grey_milk_tea',    35),
-('prod_sparkling_berry_hibiscus',40),
-('prod_truffle_beef_bowl',     20),
-('prod_creamy_carbonara',      18),
-('prod_crispy_chicken_matah',  25),
-('prod_uji_matcha_latte',      34),
-('prod_strawberry_matcha_latte',25),
-('prod_lychee_yakult_breeze',  40),
-('prod_mango_yakult_cooler',   35),
-('prod_truffle_fries',         40),
-('prod_french_croissant',      14),
-('prod_crispy_chicken_tenders',22),
-('prod_pain_au_chocolat',      4),
-('prod_addon_espresso_shot',   100),
-('prod_addon_oat_milk',        80),
-('prod_addon_sea_salt_foam',   60),
-('prod_addon_flavor_syrup',    90);
+('prod_crib_aren_latte', 45),
+('prod_crib_butterscotch_latte', 40),
+('prod_crib_chocolate_creamy', 35),
+('prod_crib_red_spark', 30),
+('prod_crib_matcha_strawberry', 25),
+('prod_cappucino', 50),
+('prod_latte', 50),
+('prod_americano', 60),
+('prod_strawberry_cano', 40),
+('prod_peach_cano', 40),
+('prod_pineapple_cano', 40),
+('prod_vanilla_latte', 45),
+('prod_caramel_latte', 45),
+('prod_cookies_cream', 35),
+('prod_red_velvet', 35),
+('prod_taro', 35),
+('prod_lemon_tea', 50),
+('prod_lychee_tea', 45),
+('prod_mineral_water', 100),
+('prod_crib_chiken_salted_egg', 25),
+('prod_crib_nanban_rice_garlic', 25),
+('prod_crib_fried_rice', 30),
+('prod_crib_comfort_fried_rice', 30),
+('prod_matcha_latte', 35),
+('prod_matcha_vanilla', 35),
+('prod_peach_yakult', 40),
+('prod_pineapple_yakult', 40),
+('prod_strawberry_yakult', 40),
+('prod_crib_bites_platter', 30),
+('prod_french_fries', 50),
+('prod_choco_cheese_toasty', 35),
+('prod_crispy_banana_cho_chees', 35),
+('prod_cireng_rujak', 40),
+('prod_dimsum', 35),
+('prod_extra_shoot', 100),
+('prod_fried_egg', 50),
+('prod_extra_syrup', 80);
 
 -- ------------------------------------------------------------------------------
 -- Inventory Adjustments Seed
 -- ------------------------------------------------------------------------------
 INSERT IGNORE INTO `inventory_adjustments` (`id`, `product_id`, `actor_user_id`, `previous_quantity`, `adjustment_quantity`, `resulting_quantity`, `reason`) VALUES
-('adj_init_01', 'prod_crib_signature', 'usr_owner_01', 0, 45, 45, 'Initial stock inbound for opening'),
-('adj_init_02', 'prod_french_croissant', 'usr_owner_01', 0, 14, 14, 'Morning fresh bakery delivery'),
-('adj_init_03', 'prod_uji_matcha_latte', 'usr_owner_01', 0, 34, 34, 'Uji ceremonial stock inbound'),
-('adj_init_04', 'prod_truffle_beef_bowl', 'usr_owner_01', 0, 20, 20, 'Kitchen inventory preparation');
+('adj_init_001', 'prod_crib_aren_latte', 'usr_owner_01', 0, 45, 45, 'Initial batch upload'),
+('adj_init_002', 'prod_crib_comfort_fried_rice', 'usr_owner_01', 0, 30, 30, 'Initial kitchen stock');
 
 -- ------------------------------------------------------------------------------
 -- Sample Orders Seed
 -- ------------------------------------------------------------------------------
-INSERT IGNORE INTO `orders` (`id`, `order_number`,`status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
-('ord_sample_01', 'CSC-1001', 'completed', 'paid', 67000.00, 10000.00, 57000.00, 'usr_staff_01', NOW() - INTERVAL 2 HOUR),
-('ord_sample_02', 'CSC-1002', 'preparing', 'paid', 43000.00, 0.00, 43000.00, 'usr_staff_02', NOW() - INTERVAL 20 MINUTE),
-('ord_sample_03', 'CSC-1003', 'ready', 'paid', 34000.00, 0.00, 34000.00, 'usr_staff_01', NOW() - INTERVAL 10 MINUTE),
-('ord_sample_04', 'CSC-1004', 'pending', 'pending', 38000.00, 0.00, 38000.00, 'usr_staff_01', NOW() - INTERVAL 4 MINUTE);
+INSERT IGNORE INTO `orders` (`id`, `order_number`, `status`, `payment_status`, `subtotal`, `discount_total`, `total`, `created_by`, `created_at`) VALUES
+('ord_init_01', 'CSC-1001', 'COMPLETED', 'PAID', 68000.00, 0.00, 68000.00, 'usr_staff_01', NOW() - INTERVAL 1 HOUR),
+('ord_init_02', 'CSC-1002', 'IN_PREPARATION', 'PAID', 41000.00, 0.00, 41000.00, 'usr_staff_02', NOW() - INTERVAL 15 MINUTE),
+('ord_init_03', 'CSC-1003', 'PENDING', 'UNPAID', 28000.00, 0.00, 28000.00, 'usr_staff_01', NOW() - INTERVAL 5 MINUTE);
 
 INSERT IGNORE INTO `order_items` (`id`, `order_id`, `product_id`, `product_name_snapshot`, `unit_price`, `quantity`, `line_total`, `variant_name_snapshot`, `addon_snapshot`, `created_at`) VALUES
-('item_01_1', 'ord_sample_01', 'prod_crib_signature', 'Crib Signature Palm Latte', 35000.00, 1, 43000.00, 'Iced (16oz)', JSON_ARRAY('Sea Salt Cold Foam'), NOW() - INTERVAL 2 HOUR),
-('item_01_2', 'ord_sample_01', 'prod_french_croissant', 'French Butter Croissant', 24000.00, 1, 24000.00, 'Warmed Up', NULL, NOW() - INTERVAL 2 HOUR),
-('item_02_1', 'ord_sample_02', 'prod_uji_matcha_latte', 'Kyoto Uji Matcha Cloud', 36000.00, 1, 43000.00, 'Iced (16oz)', JSON_ARRAY('Sub Oat Milk'), NOW() - INTERVAL 20 MINUTE),
-('item_03_1', 'ord_sample_03', 'prod_tokyo_dark_americano', 'Tokyo Dark Iced Americano', 28000.00, 1, 34000.00, 'Iced (16oz)', JSON_ARRAY('Extra Espresso Shot'), NOW() - INTERVAL 10 MINUTE),
-('item_04_1', 'ord_sample_04', 'prod_v60_filter', 'V60 Single Origin Filter', 38000.00, 1, 38000.00, 'Hot Pour Over', NULL, NOW() - INTERVAL 4 MINUTE);
+('item_init_01', 'ord_init_01', 'prod_crib_aren_latte', 'CRIB AREN LATTE', 28000.00, 2, 68000.00, 'Iced', '[{"name":"Extra Shoot","price":6000}]', NOW() - INTERVAL 1 HOUR),
+('item_init_02', 'ord_init_02', 'prod_crib_comfort_fried_rice', 'CRIB COMFORT FRIED RICE', 35000.00, 1, 41000.00, 'Regular Portion', '[{"name":"Fried Egg","price":6000}]', NOW() - INTERVAL 15 MINUTE),
+('item_init_03', 'ord_init_03', 'prod_cappucino', 'CAPPUCINO', 28000.00, 1, 28000.00, 'Iced', NULL, NOW() - INTERVAL 5 MINUTE);
 
 INSERT IGNORE INTO `discounts` (`id`, `order_id`, `type`, `value`, `amount_applied`, `label`, `created_at`) VALUES
-('disc_01', 'ord_sample_01', 'fixed', 10000.00, 10000.00, 'Grand Opening Discount', NOW() - INTERVAL 2 HOUR);
+('dsc_init_01', 'ord_init_01', 'percentage', 0.00, 0.00, 'None', NOW());
 
 INSERT IGNORE INTO `payments` (`id`, `order_id`, `method`, `amount`, `status`, `external_reference`, `paid_at`, `created_at`) VALUES
-('pay_01', 'ord_sample_01', 'qris', 57000.00, 'paid', 'QRIS-GOPAY-992817231', NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 2 HOUR),
-('pay_02', 'ord_sample_02', 'cash', 43000.00, 'paid', 'CASH-REC-1002', NOW() - INTERVAL 20 MINUTE, NOW() - INTERVAL 20 MINUTE),
-('pay_03', 'ord_sample_03', 'card', 34000.00, 'paid', 'EDC-BCA-771829', NOW() - INTERVAL 10 MINUTE, NOW() - INTERVAL 10 MINUTE);
+('pay_init_01', 'ord_init_01', 'QRIS', 68000.00, 'PAID', 'QRIS-MID-001', NOW() - INTERVAL 55 MINUTE, NOW() - INTERVAL 1 HOUR),
+('pay_init_02', 'ord_init_02', 'CASH', 41000.00, 'PAID', NULL, NOW() - INTERVAL 14 MINUTE, NOW() - INTERVAL 15 MINUTE);
 
 INSERT IGNORE INTO `audit_logs` (`id`, `actor_user_id`, `action`, `entity_type`, `entity_id`, `metadata`) VALUES
-('aud_01', 'usr_owner_01', 'SYSTEM_INIT', 'system', 'database', JSON_OBJECT('version', '0.2.0', 'status', 'initialized')),
-('aud_02', 'usr_owner_01', 'INVENTORY_RESTOCK', 'inventory', 'prod_crib_signature', JSON_OBJECT('qty_added', 45, 'reason', 'Initial stock inbound')),
-('aud_03', 'usr_staff_01', 'ORDER_COMPLETED', 'orders', 'ord_sample_01', JSON_OBJECT('order_number', 'CSC-1001', 'total', 57000.00, 'payment_method', 'qris'));
+('log_init_01', 'usr_owner_01', 'SYSTEM_INIT', 'database', 'main_db', '{"action":"Database seeded with Crib Society official menu catalog v2"}');
 
 SET FOREIGN_KEY_CHECKS = 1;
